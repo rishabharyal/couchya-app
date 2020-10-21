@@ -14,7 +14,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   final String _title = 'Match Movies';
   final String _subtitle = "Watch movies with someone you love.";
   final double _buttonsTopMargin = 60;
-  final double _screenPadding = 32;
   final String _imageUrl =
       "https://images.unsplash.com/photo-1496602910407-bacda74a0fe4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1300&q=80";
   @override
@@ -24,7 +23,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         color: Colors.white,
-        padding: EdgeInsets.all(this._screenPadding),
+        padding: EdgeInsets.all(MediaQuery.of(context).padding.top),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
