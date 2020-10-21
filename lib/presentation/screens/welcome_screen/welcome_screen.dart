@@ -3,6 +3,9 @@ import 'package:couchya/utilities/size_config.dart';
 import 'package:flutter/material.dart';
 
 class WelcomeScreen extends StatefulWidget {
+  final AsyncSnapshot snapshot;
+
+  const WelcomeScreen(this.snapshot);
   @override
   _WelcomeScreenState createState() => _WelcomeScreenState();
 }
@@ -82,7 +85,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         children: [
           GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, 'login');
+              Navigator.pushNamed(context, 'login', arguments: widget.snapshot);
             },
             child: Container(
               child: Text(
@@ -93,7 +96,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           ),
           GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, 'register');
+              Navigator.pushNamed(context, 'register',
+                  arguments: widget.snapshot);
             },
             child: Container(
               child: Text(

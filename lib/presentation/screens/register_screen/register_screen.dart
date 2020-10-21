@@ -1,4 +1,5 @@
 import 'package:couchya/api/auth.dart';
+import 'package:couchya/api/team.dart';
 import 'package:couchya/presentation/common/alert.dart';
 import 'package:couchya/presentation/common/form_field.dart';
 import 'package:couchya/utilities/api_response.dart';
@@ -10,6 +11,9 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class RegisterScreen extends StatefulWidget {
+  final AsyncSnapshot snapshot;
+
+  const RegisterScreen(this.snapshot);
   @override
   _RegisterScreenState createState() => _RegisterScreenState();
 }
@@ -210,6 +214,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  Future _joinTeam(id) async {
+    Fluttertoast.showToast(
+      msg: "Joining Team!",
+      backgroundColor: AppTheme.accentColor,
+    );
+    ApiResponse r = await TeamApi.join(id);
+    if (r.hasErrors()) {
+      Fluttertoast.showToast(
+        msg: r.getMessage() != ""
+            ? r.getMessage()
+            : 'Something went wrong. Please try again!',
+        backgroundColor: AppTheme.accentColor,
+      );
+      return null;
+    }
+    Fluttertoast.showToast(
+      msg: r.getMessage() != ""
+          ? r.getMessage()
+          : 'You have joined the team successfully!',
+      backgroundColor: Theme.of(context).primaryColor,
+    );
+    return null;
+  }
+
   Future<void> _handleRegister() async {
     FocusScope.of(context).unfocus();
     setState(() {
@@ -231,6 +259,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
             msg: error ?? 'Something went wrong. Please try again!',
             backgroundColor: Theme.of(context).accentColor);
       } else {
+        if ((widget.snapshot != null && widget.snapshot.hasData)) {
+          var uri = Uri.parse(widget.snapshot.data);
+          var list = uri.queryParametersAll;
+          int id = int.parse(list['id'][0]);
+          String path = uri.path;
+
+          if (path == "/team/join" && id != null) {
+            _joinTeam(id);
+          }
+        }
         Navigator.of(context)
             .pushNamedAndRemoveUntil('home', (Route<dynamic> route) => false);
       }

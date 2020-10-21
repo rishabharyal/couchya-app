@@ -6,8 +6,6 @@ import 'package:couchya/presentation/bloc/home_page_bloc.dart';
 import 'package:couchya/presentation/bloc/matches_page_bloc.dart';
 import 'package:couchya/presentation/common/logo.dart';
 import 'package:couchya/presentation/screens/home_screen/home_screen.dart';
-import 'package:couchya/presentation/screens/loading_screen/loading_screen.dart';
-// import 'package:couchya/presentation/screens/loading_screen/loading_screen.dart';
 import 'package:couchya/presentation/screens/login_screen/login_screen.dart';
 import 'package:couchya/presentation/screens/matches_screen/matches_screen.dart';
 import 'package:couchya/presentation/screens/register_screen/register_screen.dart';
@@ -34,9 +32,12 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   bool _isLoggedIn = false;
   bool _isAuthChecked = false;
+  bool _joinTeamLater = false;
+  int _joinTeamId;
 
   _checkAuth() async {
     bool auth = await Auth.isAuthenticated();
+
     setState(() {
       _isAuthChecked = true;
       _isLoggedIn = auth;
@@ -64,6 +65,7 @@ class _MyAppState extends State<MyApp> {
           : 'You have joined the team successfully!',
       backgroundColor: Theme.of(context).primaryColor,
     );
+    return null;
   }
 
   @override
@@ -73,10 +75,13 @@ class _MyAppState extends State<MyApp> {
   }
 
   final Map<String, WidgetBuilder> _routes = {
-    'login': (context) => LoginScreen(),
-    'register': (context) => RegisterScreen(),
+    'login': (context) =>
+        LoginScreen(ModalRoute.of(context).settings.arguments),
+    'register': (context) =>
+        RegisterScreen(ModalRoute.of(context).settings.arguments),
     'home': (context) => HomeScreen(),
-    'welcome': (context) => WelcomeScreen(),
+    'welcome': (context) =>
+        WelcomeScreen(ModalRoute.of(context).settings.arguments),
     'team/create': (context) => CreateTeamScreen(),
     'team/invite-members': (context) =>
         InviteTeamMembersScreen(ModalRoute.of(context).settings.arguments),
@@ -104,17 +109,19 @@ class _MyAppState extends State<MyApp> {
                 home: StreamBuilder(
                   stream: getLinksStream(),
                   builder: (context, snapshot) {
-                    if (snapshot.hasData && _isLoggedIn) {
+                    if ((snapshot.hasData)) {
                       var uri = Uri.parse(snapshot.data);
                       var list = uri.queryParametersAll;
                       int id = int.parse(list['id'][0]);
-                      this._joinTeam(id);
-                      return HomeScreen();
-                    } else {
-                      if (!_isAuthChecked) return buildLoadingPage();
-                      if (_isAuthChecked && _isLoggedIn) return HomeScreen();
-                      return WelcomeScreen();
+                      String path = uri.path;
+
+                      if (path == "/team/join" && id != null) {
+                        if (_isLoggedIn) _joinTeam(id);
+                      }
                     }
+                    if (!_isAuthChecked) return buildLoadingPage();
+                    if (_isAuthChecked && _isLoggedIn) return HomeScreen();
+                    return WelcomeScreen(snapshot);
                   },
                 ),
               );
