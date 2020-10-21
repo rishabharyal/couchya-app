@@ -3,6 +3,7 @@ import 'package:couchya/api/auth.dart';
 import 'package:couchya/app_config.dart';
 import 'package:couchya/utilities/api_response.dart';
 import 'package:couchya/utilities/local_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class CallApi {
@@ -49,7 +50,10 @@ class CallApi {
       apiResponse.setSuccess(true);
       apiResponse.setData(decoded);
       return apiResponse;
-    } else if (response.statusCode == 401) Auth.logout();
+    } else if (response.statusCode == 401) {
+      Auth.logout();
+    }
+    ;
     apiResponse.setErrors(decoded['data']);
     return apiResponse;
   }

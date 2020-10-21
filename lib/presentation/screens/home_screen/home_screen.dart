@@ -4,7 +4,7 @@ import 'package:couchya/presentation/common/dropdown.dart';
 import 'package:couchya/presentation/common/logo.dart';
 import 'package:couchya/presentation/common/range.dart';
 import 'package:couchya/presentation/screens/home_screen/pages/home_page.dart';
-import 'package:couchya/presentation/screens/home_screen/pages/matches_page.dart';
+import 'package:couchya/presentation/screens/home_screen/pages/teams_page.dart';
 import 'package:couchya/utilities/app_theme.dart';
 import 'package:couchya/utilities/size_config.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Widget> _navigationPages = [
     HomePage(),
-    MatchesPage(),
+    TeamsPage(),
     Container(color: Colors.lightBlue),
   ];
 
@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     Provider.of<HomePageBloc>(context, listen: false).loadMovies();
-    Provider.of<MatchesPageBloc>(context, listen: false).getTeams();
+    Provider.of<TeamsBloc>(context, listen: false).getTeams();
     super.initState();
   }
 

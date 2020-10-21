@@ -1,28 +1,26 @@
-import 'dart:async';
-
 import 'package:couchya/models/team.dart';
 import 'package:couchya/models/user.dart';
 import 'package:couchya/presentation/bloc/matches_page_bloc.dart';
+import 'package:couchya/presentation/common/user_avatar.dart';
 import 'package:couchya/utilities/app_theme.dart';
 import 'package:couchya/utilities/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 
-class MatchesPage extends StatefulWidget {
+class TeamsPage extends StatefulWidget {
   @override
-  _MatchesPageState createState() => _MatchesPageState();
+  _TeamsPageState createState() => _TeamsPageState();
 }
 
-class _MatchesPageState extends State<MatchesPage> {
+class _TeamsPageState extends State<TeamsPage> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<MatchesPageBloc>(
-        builder: (context, matchesPageBloc, child) {
-      List<Team> teams = matchesPageBloc.teams ?? [];
+    return Consumer<TeamsBloc>(builder: (context, teamsBloc, child) {
+      List<Team> teams = teamsBloc.teams ?? [];
       return RefreshIndicator(
         onRefresh: () async {
-          Provider.of<MatchesPageBloc>(context, listen: false).getTeams();
+          Provider.of<TeamsBloc>(context, listen: false).getTeams();
         },
         child: Stack(children: [
           ListView(children: [
@@ -63,7 +61,7 @@ class _MatchesPageState extends State<MatchesPage> {
               physics: NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               itemCount: teams.length,
-              itemBuilder: (team, index) {
+              itemBuilder: (context, index) {
                 return _buildTeamRow(teams[index]);
               },
             )
@@ -77,47 +75,39 @@ class _MatchesPageState extends State<MatchesPage> {
   }
 
   Widget _buildTeamRow(Team team) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              child: Text(
-                team.title,
-                style: Theme.of(context).textTheme.headline2.copyWith(),
-              ),
-            ),
-            Container(
-              height: 22,
-              width: 22,
-              decoration: BoxDecoration(
-                color: Theme.of(context).accentColor,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Center(
-                child: Text(
-                  '2',
-                  style: Theme.of(context).textTheme.headline2.copyWith(
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
-                ),
-              ),
-            ),
-          ],
+    return ListTile(
+      onTap: () {
+        Navigator.pushNamed(context, 'team/show', arguments: team.id);
+      },
+      contentPadding: EdgeInsets.all(0),
+      title: Text(
+        team.title,
+        style: Theme.of(context).textTheme.headline2.copyWith(),
+      ),
+      trailing: Container(
+        height: 22,
+        width: 22,
+        decoration: BoxDecoration(
+          color: Theme.of(context).accentColor,
+          borderRadius: BorderRadius.circular(4),
         ),
-        Container(
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            width: SizeConfig.screenWidth,
-            child: new Stack(
-              children: _buildUserList(team.members),
-            ),
+        child: Center(
+          child: Text(
+            '2',
+            style: Theme.of(context).textTheme.headline2.copyWith(
+                  fontSize: 18,
+                  color: Colors.white,
+                ),
           ),
-        )
-      ],
+        ),
+      ),
+      subtitle: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        width: SizeConfig.screenWidth,
+        child: new Stack(
+          children: _buildUserList(team.members),
+        ),
+      ),
     );
   }
 
@@ -157,30 +147,10 @@ class _MatchesPageState extends State<MatchesPage> {
         widgets.add(
           Positioned(
             left: SizeConfig.widthMultiplier * 10 * index,
-            child: Column(
-              children: [
-                Container(
-                  height: SizeConfig.widthMultiplier * 12.5,
-                  width: SizeConfig.widthMultiplier * 12.5,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(200),
-                    child: Image.network(
-                      'https://images.unsplash.com/photo-1496602910407-bacda74a0fe4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1300&q=80',
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 4.0),
-                  child: Text(
-                    member.name.substring(0, 3) + "..",
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText1
-                        .copyWith(color: AppTheme.inactiveGreyColor),
-                  ),
-                ),
-              ],
+            child: userAvatar(
+              url:
+                  "https://images.unsplash.com/photo-1496602910407-bacda74a0fe4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1300&q=80",
+              name: "ASHOK",
             ),
           ),
         );

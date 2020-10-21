@@ -18,7 +18,7 @@ dependencies:
   permission_handler: ^5.0.1+1
   flutter_tindercard: ^0.2.0
   contacts_service: ^0.4.6
-  flutter_platform_widgets: any
+  uni_links: ^0.4.0
 
 dev_dependencies:
   flutter_test:
