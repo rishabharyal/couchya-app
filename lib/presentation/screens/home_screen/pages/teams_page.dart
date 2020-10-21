@@ -118,33 +118,7 @@ class _TeamsPageState extends State<TeamsPage> {
 
     members.asMap().forEach((index, member) {
       if (index == 0) {
-        widgets.add(
-          Column(
-            children: [
-              Container(
-                height: SizeConfig.widthMultiplier * 12.5,
-                width: SizeConfig.widthMultiplier * 12.5,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(200),
-                  child: Image.network(
-                    member.image,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 4.0),
-                child: Text(
-                  member.name.substring(0, 3) + "..",
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyText1
-                      .copyWith(color: AppTheme.inactiveGreyColor),
-                ),
-              ),
-            ],
-          ),
-        );
+        widgets.add(userAvatar(url: member.image, name: member.name));
       } else if (index < 3) {
         widgets.add(
           Positioned(

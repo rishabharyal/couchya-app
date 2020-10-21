@@ -6,28 +6,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tindercard/flutter_tindercard.dart';
 import 'package:provider/provider.dart';
 
-class HomePage extends StatefulWidget {
-  @override
-  _HomePageState createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  CardController controller = new CardController();
-  bool _isMovieLiked = false;
-  final int _moviesInOneRequest = 16;
-  int _currentlyVisibleCard = 0;
+class HomePage extends StatelessWidget {
+  final CardController controller = new CardController();
+  // bool _isMovieLiked = false;
+  final int _moviesInOneRequest = 17;
 
   @override
   Widget build(BuildContext context) {
     return Consumer<HomePageBloc>(builder: (context, homePageBloc, child) {
       List<Movie> movies = homePageBloc.movies;
+      int currentlyVisibleMovie = homePageBloc.currentlyVisibleCard;
+      bool isMovieLiked = homePageBloc.isMovieLiked;
       return movies.length > 0
-          ? _buildSwipeCards(movies)
-          : _buildLoadingWidget();
+          ? _buildSwipeCards(
+              context, movies, currentlyVisibleMovie, isMovieLiked)
+          : _buildLoadingWidget(context);
     });
   }
 
-  Widget _buildSwipeCards(List<Movie> movies) {
+  Widget _buildSwipeCards(BuildContext context, List<Movie> movies,
+      int currentlyVisibleMovie, bool isMovieLiked) {
     return Container(
       padding: EdgeInsets.all(12),
       height: SizeConfig.screenHeight,
@@ -44,12 +42,14 @@ class _HomePageState extends State<HomePage> {
         minHeight: SizeConfig.screenHeight * 0.89,
         cardBuilder: (context, index) => Card(
           child: new Container(
-            child: _buildTextOverlay(index, movies),
+            child: _buildTextOverlay(
+                context, index, movies, currentlyVisibleMovie, isMovieLiked),
             decoration: new BoxDecoration(
               color: AppTheme.successColor,
               image: new DecorationImage(
                 fit: BoxFit.cover,
-                colorFilter: _getColorOverlay(index),
+                colorFilter: _getColorOverlay(
+                    context, index, currentlyVisibleMovie, isMovieLiked),
                 image: new NetworkImage(
                   '${movies[index].poster}',
                 ),
@@ -61,29 +61,24 @@ class _HomePageState extends State<HomePage> {
         swipeUpdateCallback: (DragUpdateDetails details, Alignment align) {
           /// Get swiping card's alignment
           if (align.x > 0) {
-            if (_isMovieLiked != true)
-              setState(() {
-                _isMovieLiked = true;
-              });
+            if (isMovieLiked != true)
+              Provider.of<HomePageBloc>(context, listen: false)
+                  .setIsMovieLiked(true);
           } else {
-            if (_isMovieLiked != false)
-              setState(() {
-                _isMovieLiked = false;
-              });
+            if (isMovieLiked != false)
+              Provider.of<HomePageBloc>(context, listen: false)
+                  .setIsMovieLiked(false);
           }
         },
         swipeCompleteCallback: (CardSwipeOrientation orientation, int index) {
-          if (_isMovieLiked)
+          if (isMovieLiked)
             Provider.of<HomePageBloc>(context, listen: false)
-              ..likeMovie(movies[_currentlyVisibleCard].id);
-          setState(() {
-            _isMovieLiked = false;
-            _currentlyVisibleCard = index + 1;
-          });
-          if (index == _moviesInOneRequest) {
-            setState(() {
-              _currentlyVisibleCard = 0;
-            });
+                .setIsMovieLiked(false);
+          Provider.of<HomePageBloc>(context, listen: false)
+            ..likeMovie(movies[currentlyVisibleMovie].id);
+          Provider.of<HomePageBloc>(context, listen: false)
+              .increamentCurrentlyVisibleCard();
+          if (index + 1 == _moviesInOneRequest) {
             Provider.of<HomePageBloc>(context, listen: false).resetMovies();
             Provider.of<HomePageBloc>(context, listen: false).loadMovies();
           }
@@ -92,8 +87,9 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildTextOverlay(int index, List<Movie> movies) {
-    if (index == _currentlyVisibleCard && _isMovieLiked)
+  Widget _buildTextOverlay(BuildContext context, int index, List<Movie> movies,
+      int currentlyVisibleMovie, bool isMovieLiked) {
+    if (index == currentlyVisibleMovie && isMovieLiked)
       return Center(
         child: Text(
           'LIKE',
@@ -136,8 +132,9 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  ColorFilter _getColorOverlay(int index) {
-    if (index == _currentlyVisibleCard && _isMovieLiked)
+  ColorFilter _getColorOverlay(BuildContext context, int index,
+      int currentlyVisibleMovie, bool isMovieLiked) {
+    if (index == currentlyVisibleMovie && isMovieLiked)
       return ColorFilter.mode(
         AppTheme.successColor.withOpacity(0.08),
         BlendMode.dstATop,
@@ -148,7 +145,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildLoadingWidget() {
+  Widget _buildLoadingWidget(BuildContext context) {
     return Center(
         child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -165,3 +162,10 @@ class _HomePageState extends State<HomePage> {
     ));
   }
 }
+
+// class HomePage extends StatefulWidget {
+//   @override
+//   _HomePageState createState() => _HomePageState();
+// }
+
+// class _HomePageState extends State<HomePage> {}

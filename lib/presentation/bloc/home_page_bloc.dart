@@ -9,9 +9,12 @@ class HomePageBloc extends ChangeNotifier {
   static String _genre = "";
   static RangeValues _range =
       new RangeValues(1900, DateTime.now().year.toDouble());
+  static int _currentlyVisibleCard = 0;
+  static bool _isCurrentMovieLiked = false;
 
   setMovies(List<Movie> movies) {
     HomePageBloc._movies = movies;
+    _currentlyVisibleCard = 0;
     notifyListeners();
   }
 
@@ -19,6 +22,16 @@ class HomePageBloc extends ChangeNotifier {
     HomePageBloc._movies = [];
     notifyListeners();
     HomePageBloc._page = -1;
+  }
+
+  setIsMovieLiked(bool b) {
+    _isCurrentMovieLiked = b;
+    notifyListeners();
+  }
+
+  increamentCurrentlyVisibleCard() {
+    _currentlyVisibleCard++;
+    notifyListeners();
   }
 
   setRange(RangeValues range) {
@@ -37,6 +50,7 @@ class HomePageBloc extends ChangeNotifier {
       'range_start': _range.start.round().toInt(),
       'range_end': _range.end.round().toInt(),
     });
+    print(movies.length);
     setMovies(movies);
   }
 
@@ -45,4 +59,6 @@ class HomePageBloc extends ChangeNotifier {
   }
 
   List<Movie> get movies => _movies;
+  int get currentlyVisibleCard => _currentlyVisibleCard;
+  bool get isMovieLiked => _isCurrentMovieLiked;
 }

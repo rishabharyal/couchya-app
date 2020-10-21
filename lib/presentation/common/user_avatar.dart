@@ -6,8 +6,8 @@ Widget userAvatar({@required String url, @required String name}) {
   return Column(
     children: [
       Container(
-        height: SizeConfig.widthMultiplier * 12.5,
-        width: SizeConfig.widthMultiplier * 12.5,
+        height: SizeConfig.widthMultiplier * 14,
+        width: SizeConfig.widthMultiplier * 14,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(200),
           child: Image.network(

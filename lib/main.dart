@@ -1,5 +1,10 @@
+import 'dart:ffi';
+
+import 'package:couchya/api/auth.dart';
+import 'package:couchya/api/team.dart';
 import 'package:couchya/presentation/bloc/home_page_bloc.dart';
 import 'package:couchya/presentation/bloc/matches_page_bloc.dart';
+import 'package:couchya/presentation/common/logo.dart';
 import 'package:couchya/presentation/screens/home_screen/home_screen.dart';
 import 'package:couchya/presentation/screens/loading_screen/loading_screen.dart';
 // import 'package:couchya/presentation/screens/loading_screen/loading_screen.dart';
@@ -9,9 +14,11 @@ import 'package:couchya/presentation/screens/register_screen/register_screen.dar
 import 'package:couchya/presentation/screens/team_screen/invite_team_members_screen.dart';
 import 'package:couchya/presentation/screens/team_screen/add_team_name_screen.dart';
 import 'package:couchya/presentation/screens/welcome_screen/welcome_screen.dart';
+import 'package:couchya/utilities/api_response.dart';
 import 'package:couchya/utilities/app_theme.dart';
 import 'package:couchya/utilities/size_config.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:uni_links/uni_links.dart';
 
@@ -19,8 +26,52 @@ void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  // app routes here
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool _isLoggedIn = false;
+  bool _isAuthChecked = false;
+
+  _checkAuth() async {
+    bool auth = await Auth.isAuthenticated();
+    setState(() {
+      _isAuthChecked = true;
+      _isLoggedIn = auth;
+    });
+  }
+
+  Future<Void> _joinTeam(id) async {
+    Fluttertoast.showToast(
+      msg: "Joining Team!",
+      backgroundColor: AppTheme.accentColor,
+    );
+    ApiResponse r = await TeamApi.join(id);
+    if (r.hasErrors()) {
+      Fluttertoast.showToast(
+        msg: r.getMessage() != ""
+            ? r.getMessage()
+            : 'Something went wrong. Please try again!',
+        backgroundColor: AppTheme.accentColor,
+      );
+      return null;
+    }
+    Fluttertoast.showToast(
+      msg: r.getMessage() != ""
+          ? r.getMessage()
+          : 'You have joined the team successfully!',
+      backgroundColor: Theme.of(context).primaryColor,
+    );
+  }
+
+  @override
+  void initState() {
+    this._checkAuth();
+    super.initState();
+  }
+
   final Map<String, WidgetBuilder> _routes = {
     'login': (context) => LoginScreen(),
     'register': (context) => RegisterScreen(),
@@ -32,7 +83,7 @@ class MyApp extends StatelessWidget {
     'team/show': (context) =>
         MatchesScreen(ModalRoute.of(context).settings.arguments),
   };
-  // This widget is the root of your application.
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -53,20 +104,44 @@ class MyApp extends StatelessWidget {
                 home: StreamBuilder(
                   stream: getLinksStream(),
                   builder: (context, snapshot) {
-                    if (snapshot.hasData) {
+                    if (snapshot.hasData && _isLoggedIn) {
                       var uri = Uri.parse(snapshot.data);
                       var list = uri.queryParametersAll;
                       int id = int.parse(list['id'][0]);
-                      print(id);
-                      return MatchesScreen(id);
+                      this._joinTeam(id);
+                      return HomeScreen();
+                    } else {
+                      if (!_isAuthChecked) return buildLoadingPage();
+                      if (_isAuthChecked && _isLoggedIn) return HomeScreen();
+                      return WelcomeScreen();
                     }
-                    return LoadingScreen();
                   },
                 ),
               );
             },
           );
         },
+      ),
+    );
+  }
+
+  Widget buildLoadingPage() {
+    return Scaffold(
+      body: SafeArea(
+        child: Container(
+          height: SizeConfig.screenHeight,
+          width: SizeConfig.screenWidth,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Logo.make(),
+                CircularProgressIndicator(),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

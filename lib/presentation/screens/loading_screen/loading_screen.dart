@@ -12,9 +12,11 @@ class _LoadingScreenState extends State<LoadingScreen> {
   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey();
   _checkAuth() async {
     if (await Auth.isAuthenticated()) {
-      Navigator.pushNamed(context, 'home');
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil('home', (Route<dynamic> route) => false);
     } else {
-      Navigator.pushNamed(context, 'welcome');
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil('welcome', (Route<dynamic> route) => false);
     }
   }
 

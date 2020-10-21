@@ -1,3 +1,4 @@
+import 'package:couchya/api/auth.dart';
 import 'package:couchya/models/user.dart';
 import 'package:couchya/presentation/bloc/home_page_bloc.dart';
 import 'package:couchya/presentation/bloc/matches_page_bloc.dart';
@@ -5,6 +6,7 @@ import 'package:couchya/presentation/common/dropdown.dart';
 import 'package:couchya/presentation/common/logo.dart';
 import 'package:couchya/presentation/common/range.dart';
 import 'package:couchya/presentation/screens/home_screen/pages/home_page.dart';
+import 'package:couchya/presentation/screens/home_screen/pages/liked_page.dart';
 import 'package:couchya/presentation/screens/home_screen/pages/teams_page.dart';
 import 'package:couchya/utilities/app_theme.dart';
 import 'package:couchya/utilities/local_storage.dart';
@@ -53,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Widget> _navigationPages = [
     HomePage(),
     TeamsPage(),
-    Container(color: Colors.lightBlue),
+    LikedPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -124,16 +126,23 @@ class _HomeScreenState extends State<HomeScreen> {
       title: Center(
         child: Logo.make(color: Colors.black),
       ),
-      leading: Container(
-        padding: EdgeInsets.all(12),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: _loggedInUser != null
-              ? Image.network(
-                  _loggedInUser.image,
-                  fit: BoxFit.cover,
-                )
-              : Container(),
+      leading: GestureDetector(
+        onTap: () async {
+          await Auth.logout();
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              'welcome', (Route<dynamic> route) => false);
+        },
+        child: Container(
+          padding: EdgeInsets.all(12),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: _loggedInUser != null
+                ? Image.network(
+                    _loggedInUser.image,
+                    fit: BoxFit.cover,
+                  )
+                : Container(),
+          ),
         ),
       ),
       actions: [

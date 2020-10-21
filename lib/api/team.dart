@@ -16,6 +16,11 @@ class TeamApi {
     return response;
   }
 
+  static Future<ApiResponse> join(id) async {
+    ApiResponse response = await CallApi.get('team/join' + id.toString());
+    return response;
+  }
+
   static Future<ApiResponse> sendInvitation(data) async {
     ApiResponse response = await CallApi.post('team/invite', data);
     return response;

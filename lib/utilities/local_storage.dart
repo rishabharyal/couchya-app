@@ -4,6 +4,8 @@ import 'package:couchya/models/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorage {
+  LocalStorage._();
+
   static Future<String> getToken() async {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     var token = localStorage.getString('token');
@@ -28,10 +30,6 @@ class LocalStorage {
     var user = localStorage.getString('user') != null
         ? User.fromJson(json.decode(localStorage.getString('user')))
         : null;
-
-    print("---------------------");
-    print(localStorage.getString('user'));
-    print("---------------------");
     return user;
   }
 

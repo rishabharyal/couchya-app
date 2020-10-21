@@ -231,7 +231,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             msg: error ?? 'Something went wrong. Please try again!',
             backgroundColor: Theme.of(context).accentColor);
       } else {
-        Navigator.pushNamed(context, 'home');
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil('home', (Route<dynamic> route) => false);
       }
     } catch (e) {
       alert(context, "Please check your internet connection!");

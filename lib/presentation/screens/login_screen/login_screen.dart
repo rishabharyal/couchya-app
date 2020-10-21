@@ -196,7 +196,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 : 'Something went wrong. Please try again!',
             backgroundColor: Theme.of(context).accentColor);
       } else {
-        Navigator.pushNamed(context, 'home');
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil('home', (Route<dynamic> route) => false);
       }
     } catch (e) {
       print(e);

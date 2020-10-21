@@ -6,6 +6,7 @@ import 'package:couchya/presentation/common/user_avatar.dart';
 import 'package:couchya/utilities/app_theme.dart';
 import 'package:couchya/utilities/size_config.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class MatchesScreen extends StatefulWidget {
   final int id;
@@ -25,6 +26,16 @@ class _MatchesScreenState extends State<MatchesScreen> {
     List<Match> m = await MatchesApi.get(widget.id);
     setState(() {
       _isLoading = false;
+    });
+    if (m == null) {
+      Fluttertoast.showToast(
+        msg: 'Something went wrong. Please try again!',
+        backgroundColor: Theme.of(context).accentColor,
+      );
+      Navigator.of(context).pop();
+      return;
+    }
+    setState(() {
       _matches = m;
     });
   }
