@@ -11,7 +11,7 @@ Widget userAvatar({@required String url, @required String name}) {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(200),
           child: Image.network(
-            'https://images.unsplash.com/photo-1496602910407-bacda74a0fe4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1300&q=80',
+            url,
             fit: BoxFit.cover,
           ),
         ),
@@ -23,7 +23,7 @@ Widget userAvatar({@required String url, @required String name}) {
           style: TextStyle(
             color: AppTheme.inactiveGreyColor,
             fontWeight: FontWeight.w300,
-            fontSize: 1.8 * SizeConfig.textMultiplier,
+            fontSize: 2 * SizeConfig.textMultiplier,
           ),
         ),
       ),

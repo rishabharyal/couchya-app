@@ -75,37 +75,39 @@ class _TeamsPageState extends State<TeamsPage> {
   }
 
   Widget _buildTeamRow(Team team) {
-    return ListTile(
-      onTap: () {
-        Navigator.pushNamed(context, 'team/show', arguments: team.id);
-      },
-      contentPadding: EdgeInsets.all(0),
-      title: Text(
-        team.title,
-        style: Theme.of(context).textTheme.headline2.copyWith(),
-      ),
-      trailing: Container(
-        height: 22,
-        width: 22,
-        decoration: BoxDecoration(
-          color: Theme.of(context).accentColor,
-          borderRadius: BorderRadius.circular(4),
+    return Container(
+      child: ListTile(
+        onTap: () {
+          Navigator.pushNamed(context, 'team/show', arguments: team.id);
+        },
+        contentPadding: EdgeInsets.all(0),
+        title: Text(
+          team.title,
+          style: Theme.of(context).textTheme.headline2.copyWith(),
         ),
-        child: Center(
-          child: Text(
-            '2',
-            style: Theme.of(context).textTheme.headline2.copyWith(
-                  fontSize: 18,
-                  color: Colors.white,
-                ),
+        trailing: Container(
+          height: 22,
+          width: 22,
+          decoration: BoxDecoration(
+            color: Theme.of(context).accentColor,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Center(
+            child: Text(
+              '2',
+              style: Theme.of(context).textTheme.headline2.copyWith(
+                    fontSize: 18,
+                    color: Colors.white,
+                  ),
+            ),
           ),
         ),
-      ),
-      subtitle: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        width: SizeConfig.screenWidth,
-        child: new Stack(
-          children: _buildUserList(team.members),
+        subtitle: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          width: SizeConfig.screenWidth,
+          child: new Stack(
+            children: _buildUserList(team.members),
+          ),
         ),
       ),
     );
@@ -125,7 +127,7 @@ class _TeamsPageState extends State<TeamsPage> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(200),
                   child: Image.network(
-                    'https://images.unsplash.com/photo-1496602910407-bacda74a0fe4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1300&q=80',
+                    member.image,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -148,9 +150,8 @@ class _TeamsPageState extends State<TeamsPage> {
           Positioned(
             left: SizeConfig.widthMultiplier * 10 * index,
             child: userAvatar(
-              url:
-                  "https://images.unsplash.com/photo-1496602910407-bacda74a0fe4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1300&q=80",
-              name: "ASHOK",
+              url: member.image,
+              name: member.name,
             ),
           ),
         );
@@ -178,8 +179,9 @@ class _TeamsPageState extends State<TeamsPage> {
   Widget _buildAddTeamButton() {
     return Center(
       child: Container(
-        height: SizeConfig.heightMultiplier * 6,
+        height: SizeConfig.heightMultiplier * 7,
         width: SizeConfig.widthMultiplier * 50,
+        margin: EdgeInsets.only(top: 16),
         child: RaisedButton(
           onPressed: () {
             Navigator.pushNamed(context, 'team/create');

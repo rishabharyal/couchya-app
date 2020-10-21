@@ -22,7 +22,7 @@ class User {
       email: json['email'],
       role: json['role'] != null ? json['role']['name'] : null,
       phone: json['phone'],
-      image: json['image'] ?? null,
+      image: json['profile_picture'],
     );
   }
 }

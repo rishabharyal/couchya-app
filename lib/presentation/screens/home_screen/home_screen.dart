@@ -1,3 +1,4 @@
+import 'package:couchya/models/user.dart';
 import 'package:couchya/presentation/bloc/home_page_bloc.dart';
 import 'package:couchya/presentation/bloc/matches_page_bloc.dart';
 import 'package:couchya/presentation/common/dropdown.dart';
@@ -6,6 +7,7 @@ import 'package:couchya/presentation/common/range.dart';
 import 'package:couchya/presentation/screens/home_screen/pages/home_page.dart';
 import 'package:couchya/presentation/screens/home_screen/pages/teams_page.dart';
 import 'package:couchya/utilities/app_theme.dart';
+import 'package:couchya/utilities/local_storage.dart';
 import 'package:couchya/utilities/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -22,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _activePageIndex = 0;
   bool _isFilterVisible = false;
   RangeValues _rangeValue = RangeValues(1900.0, DateTime.now().year.toDouble());
+  User _loggedInUser;
 
   List<BottomNavigationBarItem> _navigationBarItems = [
     BottomNavigationBarItem(
@@ -63,7 +66,15 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     Provider.of<HomePageBloc>(context, listen: false).loadMovies();
     Provider.of<TeamsBloc>(context, listen: false).getTeams();
+    _getUserDetails();
     super.initState();
+  }
+
+  _getUserDetails() async {
+    User u = await LocalStorage.getUser();
+    setState(() {
+      _loggedInUser = u;
+    });
   }
 
   @override
@@ -117,10 +128,12 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: EdgeInsets.all(12),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
-          child: Image.network(
-            'https://images.unsplash.com/photo-1496602910407-bacda74a0fe4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1300&q=80',
-            fit: BoxFit.cover,
-          ),
+          child: _loggedInUser != null
+              ? Image.network(
+                  _loggedInUser.image,
+                  fit: BoxFit.cover,
+                )
+              : Container(),
         ),
       ),
       actions: [

@@ -28,6 +28,10 @@ class LocalStorage {
     var user = localStorage.getString('user') != null
         ? User.fromJson(json.decode(localStorage.getString('user')))
         : null;
+
+    print("---------------------");
+    print(localStorage.getString('user'));
+    print("---------------------");
     return user;
   }
 

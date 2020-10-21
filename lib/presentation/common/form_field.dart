@@ -52,6 +52,7 @@ class _CustomFormFieldState extends State<CustomFormField> {
               ),
           suffixIcon: widget.isPassword
               ? IconButton(
+                  padding: EdgeInsets.all(0),
                   icon: Icon(
                     isPasswordVisible ? Icons.visibility : Icons.visibility_off,
                     color: Theme.of(context).primaryColorDark,

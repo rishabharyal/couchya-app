@@ -32,9 +32,11 @@ class Auth {
     print(userResponse.getData());
     if (!userResponse.hasErrors()) {
       LocalStorage.setUser({
+        'id': userResponse.getData()['data']['id'],
         'name': userResponse.getData()['data']['name'],
         'email': userResponse.getData()['data']['email'],
-        'image': userResponse.getData()['data']['image'] ?? ''
+        'profile_picture':
+            userResponse.getData()['data']['profile_picture'] ?? ''
       });
     } else
       logout();
@@ -49,7 +51,11 @@ class Auth {
   static isAuthenticated() async {
     var token = await LocalStorage.getToken();
     print('token ' + token);
-    if (token != null && token != '') return true;
+    if (token != null && token != '') {
+      ApiResponse r = await me();
+      if (r.hasErrors()) return false;
+      return true;
+    }
     return false;
   }
 }

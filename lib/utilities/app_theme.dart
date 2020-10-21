@@ -7,7 +7,7 @@ class AppTheme {
 
   static const Color primaryColor = Color(0xff0d86ca);
   static const Color accentColor = Color(0xffef4834);
-  static const Color inactiveGreyColor = Color(0xffC6C6C6);
+  static const Color inactiveGreyColor = Color(0xff6e6e6e);
   static const Color successColor = Color(0xff78e777);
 
   static final ThemeData lightTheme = ThemeData(

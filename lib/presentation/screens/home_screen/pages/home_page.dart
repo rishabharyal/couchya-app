@@ -61,9 +61,15 @@ class _HomePageState extends State<HomePage> {
         swipeUpdateCallback: (DragUpdateDetails details, Alignment align) {
           /// Get swiping card's alignment
           if (align.x > 0) {
-            setState(() {
-              _isMovieLiked = true;
-            });
+            if (_isMovieLiked != true)
+              setState(() {
+                _isMovieLiked = true;
+              });
+          } else {
+            if (_isMovieLiked != false)
+              setState(() {
+                _isMovieLiked = false;
+              });
           }
         },
         swipeCompleteCallback: (CardSwipeOrientation orientation, int index) {

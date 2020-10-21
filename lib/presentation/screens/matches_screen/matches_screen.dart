@@ -1,45 +1,83 @@
+import 'package:couchya/api/matches.dart';
+import 'package:couchya/models/match.dart';
 import 'package:couchya/models/movie.dart';
 import 'package:couchya/models/user.dart';
 import 'package:couchya/presentation/common/user_avatar.dart';
+import 'package:couchya/utilities/app_theme.dart';
 import 'package:couchya/utilities/size_config.dart';
 import 'package:flutter/material.dart';
 
 class MatchesScreen extends StatefulWidget {
   final int id;
-
   const MatchesScreen(this.id);
   @override
   _MatchesScreenState createState() => _MatchesScreenState();
 }
 
 class _MatchesScreenState extends State<MatchesScreen> {
+  List<Match> _matches = [];
+  bool _isLoading = false;
+
+  _getMatches() async {
+    setState(() {
+      _isLoading = true;
+    });
+    List<Match> m = await MatchesApi.get(widget.id);
+    setState(() {
+      _isLoading = false;
+      _matches = m;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getMatches();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildContextualAppbar(),
-      body: Container(
-        child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: 2,
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          itemBuilder: (context, index) {
-            return _buildMatchCard();
-          },
-        ),
-      ),
+      body: _isLoading
+          ? Container(
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            )
+          : Container(
+              child: _matches.length > 0
+                  ? ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _matches.length,
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      itemBuilder: (context, index) {
+                        return _buildMatchCard(_matches[index]);
+                      },
+                    )
+                  : Center(
+                      child: Text(
+                        'No Match Made Yet!',
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline2
+                            .copyWith(color: AppTheme.inactiveGreyColor),
+                      ),
+                    ),
+            ),
     );
   }
 
-  Widget _buildMatchCard() {
+  Widget _buildMatchCard(Match match) {
     return Column(
       children: [
         Stack(
           children: [
             Container(
-              margin: EdgeInsets.only(top: 12),
+              margin: EdgeInsets.only(top: 16),
               height: SizeConfig.heightMultiplier * 70,
               child: Image.network(
-                'https://images.unsplash.com/photo-1496602910407-bacda74a0fe4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1300&q=80',
+                match.movie.poster,
                 fit: BoxFit.cover,
                 width: MediaQuery.of(context).size.width,
               ),
@@ -50,9 +88,9 @@ class _MatchesScreenState extends State<MatchesScreen> {
               child: _buildTextOverlay(
                 Movie(
                   id: 1,
-                  title: "Apni jjindafas",
-                  genre: "ROCK",
-                  releaseYear: '2000',
+                  title: match.movie.title,
+                  genre: match.movie.genre,
+                  releaseYear: match.movie.releaseYear,
                 ),
               ),
             ),
@@ -62,40 +100,28 @@ class _MatchesScreenState extends State<MatchesScreen> {
           padding: const EdgeInsets.symmetric(vertical: 8),
           width: SizeConfig.screenWidth,
           child: new Stack(
-            children: _buildUserList([
-              User(id: 1, name: 'Ashok Pahadi'),
-              User(id: 1, name: 'Ashok Pahadi'),
-              User(id: 1, name: 'Ashok Pahadi'),
-              User(id: 1, name: 'Ashok Pahadi'),
-              User(id: 1, name: 'Ashok Pahadi'),
-              User(id: 1, name: 'Ashok Pahadi'),
-              User(id: 1, name: 'Ashok Pahadi'),
-            ]),
+            children: _buildUserList(match.likers),
           ),
         ),
       ],
     );
   }
 
-  List<Widget> _buildUserList(List<User> members) {
+  List<Widget> _buildUserList(List<User> likers) {
     List<Widget> widgets = [];
 
-    members.asMap().forEach((index, member) {
+    likers.asMap().forEach((index, user) {
       if (index == 0) {
         widgets.add(
-          userAvatar(
-              url:
-                  "https://images.unsplash.com/photo-1496602910407-bacda74a0fe4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1300&q=80",
-              name: member.name),
+          userAvatar(url: user.image, name: user.name),
         );
       } else {
         widgets.add(
           Positioned(
             left: SizeConfig.widthMultiplier * 10 * index,
             child: userAvatar(
-              url:
-                  "https://images.unsplash.com/photo-1496602910407-bacda74a0fe4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1300&q=80",
-              name: member.name,
+              url: user.image,
+              name: user.name,
             ),
           ),
         );
