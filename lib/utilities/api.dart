@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 
 class CallApi {
   static Future<ApiResponse> post(path, data) async {
-    Uri fullUrl = Uri.http(AppConfig.API_URL, '/api/' + path);
+    Uri fullUrl = Uri.https(AppConfig.API_URL, '/api/' + path);
     print(fullUrl);
     var response = await http.post(fullUrl,
         body: jsonEncode(data),
@@ -21,7 +21,7 @@ class CallApi {
 
   static Future<ApiResponse> get(path, [queryParams]) async {
     if (queryParams == null) queryParams = {};
-    String fullUrl = 'http://' +
+    String fullUrl = 'https://' +
         AppConfig.API_URL +
         '/api/' +
         path +
