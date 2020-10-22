@@ -21,9 +21,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = new TextEditingController();
   final TextEditingController _passwordController = new TextEditingController();
   final TextEditingController _nameController = new TextEditingController();
-  final TextEditingController _phoneController = new TextEditingController();
   String _countryCode = "+1";
   String _country = "US";
+  String _phoneNumber;
   bool _isLoading = false;
   bool _isTermsChecked = false;
 
@@ -32,7 +32,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     this._emailController.dispose();
     this._passwordController.dispose();
     this._nameController.dispose();
-    this._phoneController.dispose();
     super.dispose();
   }
 
@@ -118,9 +117,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
               },
             ),
             InternationalPhoneInput(
-              onCodeChanged: (code, country) {
-                _countryCode = code;
-                _country = country;
+              dropdownIcon: Icon(
+                Icons.filter_none,
+                size: 0,
+              ),
+              onPhoneNumberChange: (String phoneNumber,
+                  String internationalizedPhoneNumber,
+                  String isoCode,
+                  String dialCode) {
+                setState(() {
+                  _phoneNumber = phoneNumber;
+                  _country = isoCode;
+                  _countryCode = dialCode;
+                });
               },
               formStyle: Theme.of(context)
                   .textTheme
@@ -133,10 +142,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               initialSelection: "US",
               enabledCountries: ['+233', '+1', '+977'],
               labelText: "Phone Number",
-              validator: (value) {
-                Validator.phone(value);
-              },
-              controller: _phoneController,
             ),
             CustomFormField(
               hint: 'Password',
@@ -179,7 +184,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             GestureDetector(
               onTap: () {
+                print(_phoneNumber);
                 if (_isTermsChecked &&
+                    _phoneNumber.length > 0 &&
                     !_isLoading &&
                     _formKey.currentState.validate()) {
                   this._handleRegister();
@@ -255,7 +262,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       'email': _emailController.text,
       'password': _passwordController.text,
       'name': _nameController.text,
-      'phone_number': _phoneController.text,
+      'phone_number': _phoneNumber,
       'country_code': _countryCode.replaceAll("+", ""),
       'country': _country
     };

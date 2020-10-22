@@ -1,3 +1,4 @@
+import 'package:couchya/api/invitation.dart';
 import 'package:couchya/api/team.dart';
 import 'package:couchya/models/invitation.dart';
 import 'package:couchya/models/team.dart';
@@ -32,7 +33,7 @@ class TeamsPage extends StatelessWidget {
                       ? _buildInvitations(invitations, context)
                       : Container(),
                   _buildHeader("TEAMS", context),
-                  _buildTeams(teams, false, context),
+                  _buildTeams(teams, context),
                   teams.length > 0 ? Container() : _buildAddTeamButton(context),
                 ],
               ),
@@ -43,66 +44,99 @@ class TeamsPage extends StatelessWidget {
     });
   }
 
-  buildAcceptInvitationDialog(BuildContext context, int id) {
-    // set up the buttons
-    Widget cancelButton = FlatButton(
-      child: Text("Reject"),
-      onPressed: () async {
-        Navigator.pop(context);
-      },
-    );
-    Widget continueButton = FlatButton(
-      child: Text("Accept"),
-      onPressed: () async {
-        Navigator.pop(context);
-        ApiResponse r = await TeamApi.join(id);
-        if (r.hasErrors()) {
-          Fluttertoast.showToast(
-              msg: "Something went wrong! Please try again.",
-              backgroundColor: Theme.of(context).accentColor);
-          return;
-        }
-        Fluttertoast.showToast(
-          msg: "Team joined successfully!.",
-        );
-        Provider.of<TeamsBloc>(context, listen: false).refreshData();
-      },
-    );
-
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: Text("Join Team"),
-      content: Text("Do you want to accept this invitation?"),
-      actions: [
-        cancelButton,
-        continueButton,
-      ],
-    );
-
-    // show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
+  Widget _buildInvitations(List<Invitation> invitations, BuildContext context) {
+    return Container(
+      color: Colors.white10,
+      margin: EdgeInsets.only(bottom: 12),
+      child: ExpansionTile(
+        expandedAlignment: Alignment.topLeft,
+        childrenPadding: EdgeInsets.all(0),
+        tilePadding: EdgeInsets.all(0),
+        maintainState: true,
+        title: _buildHeader("INVITATIONS", context),
+        children: <Widget>[
+          ListView.builder(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: invitations.length,
+            itemBuilder: (context, index) {
+              return _buildInvitationRow(context, invitations[index]);
+            },
+          )
+        ],
+      ),
     );
   }
 
-  Widget _buildInvitations(List<Invitation> invitations, BuildContext context) {
-    return ExpansionTile(
-      expandedAlignment: Alignment.topLeft,
-      childrenPadding: EdgeInsets.all(0),
-      tilePadding: EdgeInsets.all(0),
-      maintainState: true,
-      title: _buildHeader("INVITATIONS", context),
-      children: <Widget>[
-        ListView.builder(
-          physics: NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          itemCount: invitations.length,
-          itemBuilder: (context, index) {
-            return _buildTeamRow(invitations[index].team, true, context);
-          },
+  _buildInvitationRow(BuildContext context, Invitation invitation) {
+    return Row(
+      children: [
+        Container(
+          margin: EdgeInsets.only(right: 24),
+          height: SizeConfig.widthMultiplier * 14,
+          width: SizeConfig.widthMultiplier * 14,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(200),
+            child: Image.network(
+              invitation.invitedBy.image,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(invitation.team.title.toUpperCase(),
+                style: Theme.of(context).textTheme.headline2),
+            Text(invitation.invitedBy.name.toUpperCase(),
+                style: Theme.of(context).textTheme.bodyText1),
+          ],
+        ),
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                padding: EdgeInsets.all(0),
+                color: Theme.of(context).primaryColor,
+                icon: Icon(Icons.add_circle),
+                iconSize: SizeConfig.textMultiplier * 4,
+                onPressed: () async {
+                  ApiResponse r = await TeamApi.join(invitation.team.id);
+                  if (r.hasErrors()) {
+                    Fluttertoast.showToast(
+                        msg: "Something went wrong! Please try again.",
+                        backgroundColor: Theme.of(context).accentColor);
+                    return;
+                  }
+                  Fluttertoast.showToast(
+                    msg: "Team joined successfully!",
+                  );
+                  Provider.of<TeamsBloc>(context, listen: false).refreshData();
+                },
+              ),
+              IconButton(
+                padding: EdgeInsets.all(0),
+                color: Theme.of(context).accentColor,
+                icon: Icon(Icons.remove_circle),
+                iconSize: SizeConfig.textMultiplier * 4,
+                onPressed: () async {
+                  ApiResponse r = await InvitationApi.reject(invitation.id);
+                  if (r.hasErrors()) {
+                    Fluttertoast.showToast(
+                        msg: "Something went wrong! Please try again.",
+                        backgroundColor: Theme.of(context).accentColor);
+                    return;
+                  }
+                  Fluttertoast.showToast(
+                    msg: "Invitation rejected successfully!",
+                  );
+                  Provider.of<TeamsBloc>(context, listen: false).refreshData();
+                },
+              ),
+            ],
+          ),
         )
       ],
     );
@@ -120,8 +154,7 @@ class TeamsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTeams(
-      List<Team> teams, bool isInvitation, BuildContext context) {
+  Widget _buildTeams(List<Team> teams, BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 4),
       child: teams.length > 0
@@ -130,7 +163,7 @@ class TeamsPage extends StatelessWidget {
               shrinkWrap: true,
               itemCount: teams.length,
               itemBuilder: (context, index) {
-                return _buildTeamRow(teams[index], isInvitation, context);
+                return _buildTeamRow(teams[index], context);
               },
             )
           : Text(
@@ -142,13 +175,11 @@ class TeamsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTeamRow(Team team, bool isInvitation, BuildContext context) {
+  Widget _buildTeamRow(Team team, BuildContext context) {
     return Container(
       child: ListTile(
         onTap: () {
-          !isInvitation
-              ? Navigator.pushNamed(context, 'team/show', arguments: team.id)
-              : buildAcceptInvitationDialog(context, team.id);
+          Navigator.pushNamed(context, 'team/show', arguments: team.id);
         },
         contentPadding: EdgeInsets.all(0),
         title: Text(

@@ -38,7 +38,7 @@ class _CustomFormFieldState extends State<CustomFormField> {
               .bodyText1
               .copyWith(fontSize: SizeConfig.textMultiplier * 3),
           inputFormatters: !widget.isWhiteSpaceAllowed
-              ? [WhitelistingTextInputFormatter(RegExp(r'[a-zA-Z0-9._@]'))]
+              ? [BlacklistingTextInputFormatter(new RegExp(r"\s\b|\b\s"))]
               : [],
           controller: widget.controller,
           validator: widget.validator,

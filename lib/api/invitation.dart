@@ -12,9 +12,9 @@ class InvitationApi {
     }).toList());
   }
 
-  static Future<ApiResponse> accept(id) async {
+  static Future<ApiResponse> reject(id) async {
     ApiResponse response =
-        await CallApi.get('Invitation/join/' + id.toString());
+        await CallApi.post('invitations/' + id.toString() + '/reject/', null);
     return response;
   }
 }

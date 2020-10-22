@@ -9,30 +9,29 @@ import 'package:flutter/services.dart';
 import 'package:international_phone_input/international_phone_input.dart';
 
 class InternationalPhoneInput extends StatefulWidget {
-  final void Function(String code, String country) onCodeChanged;
+  final void Function(String phoneNumber, String internationalizedPhoneNumber,
+      String isoCode, String dialCode) onPhoneNumberChange;
   final String initialPhoneNumber;
   final String initialSelection;
   final String errorText;
   final String hintText;
   final String labelText;
+  final TextStyle formStyle;
   final TextStyle errorStyle;
   final TextStyle hintStyle;
   final TextStyle labelStyle;
   final int errorMaxLines;
   final List<String> enabledCountries;
   final InputDecoration decoration;
-  final dynamic validator;
   final bool showCountryCodes;
+  final TextEditingController controller;
   final bool showCountryFlags;
   final Widget dropdownIcon;
   final InputBorder border;
-  final TextStyle formStyle;
-  final TextEditingController controller;
 
   InternationalPhoneInput(
-      {this.onCodeChanged,
+      {this.onPhoneNumberChange,
       this.initialPhoneNumber,
-      this.formStyle,
       this.initialSelection,
       this.errorText,
       this.hintText,
@@ -40,13 +39,13 @@ class InternationalPhoneInput extends StatefulWidget {
       this.errorStyle,
       this.hintStyle,
       this.labelStyle,
+      this.controller,
       this.enabledCountries = const [],
       this.errorMaxLines,
+      this.formStyle,
       this.decoration,
       this.showCountryCodes = true,
       this.showCountryFlags = true,
-      @required this.controller,
-      this.validator,
       this.dropdownIcon,
       this.border});
 
@@ -83,10 +82,12 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
 
   _InternationalPhoneInputState();
 
+  final phoneTextController = TextEditingController();
+
   @override
   void initState() {
     errorText = widget.errorText ?? 'Please enter a valid phone number';
-    hintText = widget.hintText;
+    hintText = widget.hintText ?? 'eg. 244056345';
     labelText = widget.labelText;
     errorStyle = widget.errorStyle;
     hintStyle = widget.hintStyle;
@@ -96,6 +97,9 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
     showCountryCodes = widget.showCountryCodes;
     showCountryFlags = widget.showCountryFlags;
     dropdownIcon = widget.dropdownIcon;
+
+    phoneTextController.addListener(_validatePhoneNumber);
+    phoneTextController.text = widget.initialPhoneNumber;
 
     _fetchCountryData().then((list) {
       Country preSelectedItem;
@@ -118,6 +122,31 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
     });
 
     super.initState();
+  }
+
+  _validatePhoneNumber() {
+    String phoneText = phoneTextController.text;
+    if (phoneText != null && phoneText.isNotEmpty) {
+      PhoneService.parsePhoneNumber(phoneText, selectedItem.code)
+          .then((isValid) {
+        setState(() {
+          hasError = !isValid;
+        });
+
+        if (widget.onPhoneNumberChange != null) {
+          if (isValid) {
+            PhoneService.getNormalizedPhoneNumber(phoneText, selectedItem.code)
+                .then((number) {
+              widget.onPhoneNumberChange(
+                  phoneText, number, selectedItem.code, selectedItem.dialCode);
+            });
+          } else {
+            widget.onPhoneNumberChange(
+                '', '', selectedItem.code, selectedItem.dialCode);
+          }
+        }
+      });
+    }
   }
 
   Future<List<Country>> _fetchCountryData() async {
@@ -171,7 +200,7 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
                   setState(() {
                     selectedItem = newValue;
                   });
-                  widget.onCodeChanged(newValue.dialCode, newValue.code);
+                  _validatePhoneNumber();
                 },
                 items: itemList.map<DropdownMenuItem<Country>>((Country value) {
                   return DropdownMenuItem<Country>(
@@ -184,7 +213,7 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
                           if (showCountryFlags) ...[
                             Image.asset(
                               value.flagUri,
-                              width: 32.0,
+                              width: 24.0,
                               package: 'international_phone_input',
                             )
                           ],
@@ -201,11 +230,10 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
             ),
           ),
           Flexible(
-              child: TextFormField(
-            style: widget.formStyle ?? null,
-            validator: widget.validator ?? null,
+              child: TextField(
             keyboardType: TextInputType.phone,
-            controller: widget.controller,
+            controller: phoneTextController,
+            style: widget.formStyle,
             decoration: decoration ??
                 InputDecoration(
                   isDense: true,
@@ -213,6 +241,7 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
                   errorText: hasError ? errorText : null,
                   hintStyle: hintStyle ?? null,
                   errorStyle: errorStyle ?? null,
+                  labelStyle: labelStyle,
                   errorMaxLines: errorMaxLines ?? 3,
                   border: border ?? null,
                 ),
