@@ -18,6 +18,7 @@ dependencies:
   permission_handler: ^5.0.1+1
   flutter_tindercard: ^0.2.0
   contacts_service: ^0.4.6
+  page_transition: ^1.1.7+2
   international_phone_input: ^1.0.4
   uni_links: ^0.4.0
 

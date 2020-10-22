@@ -1,25 +1,21 @@
 import 'package:couchya/models/team.dart';
 import 'package:couchya/models/user.dart';
-import 'package:couchya/presentation/bloc/matches_page_bloc.dart';
+import 'package:couchya/presentation/bloc/teams_bloc.dart';
 import 'package:couchya/presentation/common/user_avatar.dart';
 import 'package:couchya/utilities/app_theme.dart';
 import 'package:couchya/utilities/size_config.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 
-class TeamsPage extends StatefulWidget {
-  @override
-  _TeamsPageState createState() => _TeamsPageState();
-}
-
-class _TeamsPageState extends State<TeamsPage> {
+class TeamsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<TeamsBloc>(builder: (context, teamsBloc, child) {
       List<Team> teams = teamsBloc.teams ?? [];
+      List<Team> invitations = teamsBloc.invitations ?? [];
       return RefreshIndicator(
         onRefresh: () async {
+          Provider.of<TeamsBloc>(context, listen: false).getInvitations();
           Provider.of<TeamsBloc>(context, listen: false).getTeams();
         },
         child: Stack(children: [
@@ -29,10 +25,12 @@ class _TeamsPageState extends State<TeamsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildInvitations(teams),
-                  _buildHeader("JOINED TEAMS"),
-                  _buildTeams(teams, false),
-                  teams.length > 0 ? Container() : _buildAddTeamButton(),
+                  invitations.length > 0
+                      ? _buildInvitations(invitations, context)
+                      : Container(),
+                  _buildHeader("TEAMS", context),
+                  _buildTeams(teams, false, context),
+                  teams.length > 0 ? Container() : _buildAddTeamButton(context),
                 ],
               ),
             ),
@@ -72,19 +70,20 @@ class _TeamsPageState extends State<TeamsPage> {
     );
   }
 
-  Widget _buildInvitations(List<Team> teams) {
+  Widget _buildInvitations(List<Team> teams, BuildContext context) {
     return ExpansionTile(
+      expandedAlignment: Alignment.topLeft,
       childrenPadding: EdgeInsets.all(0),
       tilePadding: EdgeInsets.all(0),
       maintainState: true,
-      title: _buildHeader("INVITATIONS"),
+      title: _buildHeader("INVITATIONS", context),
       children: <Widget>[
-        _buildTeams(teams, true),
+        _buildTeams(teams, true, context),
       ],
     );
   }
 
-  Widget _buildHeader(String title) {
+  Widget _buildHeader(String title, BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Text(
@@ -96,7 +95,8 @@ class _TeamsPageState extends State<TeamsPage> {
     );
   }
 
-  Widget _buildTeams(List<Team> teams, bool isInvitation) {
+  Widget _buildTeams(
+      List<Team> teams, bool isInvitation, BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 4),
       child: teams.length > 0
@@ -105,7 +105,7 @@ class _TeamsPageState extends State<TeamsPage> {
               shrinkWrap: true,
               itemCount: teams.length,
               itemBuilder: (context, index) {
-                return _buildTeamRow(teams[index], isInvitation);
+                return _buildTeamRow(teams[index], isInvitation, context);
               },
             )
           : Text(
@@ -117,7 +117,7 @@ class _TeamsPageState extends State<TeamsPage> {
     );
   }
 
-  Widget _buildTeamRow(Team team, bool isInvitation) {
+  Widget _buildTeamRow(Team team, bool isInvitation, BuildContext context) {
     return Container(
       child: ListTile(
         onTap: () {
@@ -151,14 +151,14 @@ class _TeamsPageState extends State<TeamsPage> {
           padding: const EdgeInsets.symmetric(vertical: 8),
           width: SizeConfig.screenWidth,
           child: new Stack(
-            children: _buildUserList(team.members),
+            children: _buildUserList(team.members, context),
           ),
         ),
       ),
     );
   }
 
-  List<Widget> _buildUserList(List<User> members) {
+  List<Widget> _buildUserList(List<User> members, BuildContext context) {
     List<Widget> widgets = [];
 
     members.asMap().forEach((index, member) {
@@ -195,7 +195,7 @@ class _TeamsPageState extends State<TeamsPage> {
     return widgets;
   }
 
-  Widget _buildAddTeamButton() {
+  Widget _buildAddTeamButton(context) {
     return Center(
       child: Container(
         height: SizeConfig.heightMultiplier * 7,

@@ -1,7 +1,7 @@
 import 'package:couchya/api/auth.dart';
 import 'package:couchya/models/user.dart';
 import 'package:couchya/presentation/bloc/home_page_bloc.dart';
-import 'package:couchya/presentation/bloc/matches_page_bloc.dart';
+import 'package:couchya/presentation/bloc/teams_bloc.dart';
 import 'package:couchya/presentation/common/dropdown.dart';
 import 'package:couchya/presentation/common/logo.dart';
 import 'package:couchya/presentation/common/range.dart';

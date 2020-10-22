@@ -164,7 +164,7 @@ class _LoginScreenState extends State<LoginScreen> {
             padding: const EdgeInsets.only(top: 8.0),
             child: GestureDetector(
               onTap: () {
-                Navigator.pushNamed(context, 'register');
+                Navigator.pushReplacementNamed(context, 'register');
               },
               child: Text(
                 "Sign up",
