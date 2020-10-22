@@ -67,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     Provider.of<HomePageBloc>(context, listen: false).loadMovies();
-    Provider.of<TeamsBloc>(context, listen: false).getTeams();
+    Provider.of<TeamsBloc>(context, listen: false).refreshData();
     _getUserDetails();
     super.initState();
   }
@@ -181,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildFilterWidget() {
     return AnimatedPositioned(
-      top: _isFilterVisible ? 0 : -1000,
+      top: _isFilterVisible ? 0 : -400,
       curve: Curves.fastOutSlowIn,
       duration: Duration(milliseconds: 600),
       child: Container(

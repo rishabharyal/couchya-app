@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {
   final CardController controller = new CardController();
-  // bool _isMovieLiked = false;
   final int _moviesInOneRequest = 17;
 
   @override
@@ -71,11 +70,12 @@ class HomePage extends StatelessWidget {
           }
         },
         swipeCompleteCallback: (CardSwipeOrientation orientation, int index) {
-          if (isMovieLiked)
+          if (isMovieLiked) {
             Provider.of<HomePageBloc>(context, listen: false)
                 .setIsMovieLiked(false);
-          Provider.of<HomePageBloc>(context, listen: false)
-            ..likeMovie(movies[currentlyVisibleMovie].id);
+            Provider.of<HomePageBloc>(context, listen: false)
+                .likeMovie(movies[currentlyVisibleMovie].id);
+          }
           Provider.of<HomePageBloc>(context, listen: false)
               .increamentCurrentlyVisibleCard();
           if (index + 1 == _moviesInOneRequest) {
@@ -162,10 +162,3 @@ class HomePage extends StatelessWidget {
     ));
   }
 }
-
-// class HomePage extends StatefulWidget {
-//   @override
-//   _HomePageState createState() => _HomePageState();
-// }
-
-// class _HomePageState extends State<HomePage> {}

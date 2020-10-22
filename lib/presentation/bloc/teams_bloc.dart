@@ -1,20 +1,27 @@
+import 'package:couchya/api/invitation.dart';
 import 'package:couchya/api/team.dart';
+import 'package:couchya/models/invitation.dart';
 import 'package:couchya/models/team.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class TeamsBloc extends ChangeNotifier {
   static List<Team> _teams = [];
-  static List<Team> _invitations = [];
+  static List<Invitation> _invitations = [];
 
   setTeams(List<Team> teams) {
     TeamsBloc._teams = teams;
     notifyListeners();
   }
 
-  setInvitations(List<Team> teams) {
+  setInvitations(List<Invitation> teams) {
     TeamsBloc._invitations = teams;
     notifyListeners();
+  }
+
+  refreshData() {
+    getTeams();
+    getInvitations();
   }
 
   getTeams() async {
@@ -23,10 +30,11 @@ class TeamsBloc extends ChangeNotifier {
   }
 
   getInvitations() async {
-    List<Team> teams = await TeamApi.getAll();
+    List<Invitation> teams = await InvitationApi.getAll();
+    print(teams);
     setInvitations(teams);
   }
 
   List<Team> get teams => _teams;
-  List<Team> get invitations => _invitations;
+  List<Invitation> get invitations => _invitations;
 }

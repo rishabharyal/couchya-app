@@ -20,18 +20,6 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  // final Map<String, WidgetBuilder> _routes = {
-  //   'login': (context) => LoginScreen(),
-  //   'register': (context) => RegisterScreen(),
-  //   'home': (context) => HomeScreen(),
-  //   'welcome': (context) => WelcomeScreen(),
-  //   'team/create': (context) => CreateTeamScreen(),
-  //   'team/invite-members': (context) =>
-  //       InviteTeamMembersScreen(ModalRoute.of(context).settings.arguments),
-  //   'team/show': (context) =>
-  //       MatchesScreen(ModalRoute.of(context).settings.arguments),
-  // };
-
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -106,7 +94,6 @@ class MyApp extends StatelessWidget {
                         type: PageTransitionType.fade,
                         settings: settings,
                       );
-                      ;
                   }
                 },
                 debugShowCheckedModeBanner: false,

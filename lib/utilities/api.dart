@@ -48,7 +48,7 @@ class CallApi {
     } else if (response.statusCode == 401) {
       Auth.logout();
     }
-    ;
+
     apiResponse.setErrors(decoded['data']);
     return apiResponse;
   }

@@ -97,6 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
           CustomFormField(
             hint: 'Password',
             isPassword: true,
+            isWhiteSpaceAllowed: false,
             controller: _passwordController,
             validator: (value) {
               return Validator.password(value);

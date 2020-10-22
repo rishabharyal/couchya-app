@@ -1,4 +1,3 @@
-import 'package:couchya/utilities/app_theme.dart';
 import 'package:couchya/utilities/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';

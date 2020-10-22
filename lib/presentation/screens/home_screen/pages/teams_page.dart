@@ -1,10 +1,14 @@
+import 'package:couchya/api/team.dart';
+import 'package:couchya/models/invitation.dart';
 import 'package:couchya/models/team.dart';
 import 'package:couchya/models/user.dart';
 import 'package:couchya/presentation/bloc/teams_bloc.dart';
 import 'package:couchya/presentation/common/user_avatar.dart';
+import 'package:couchya/utilities/api_response.dart';
 import 'package:couchya/utilities/app_theme.dart';
 import 'package:couchya/utilities/size_config.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 class TeamsPage extends StatelessWidget {
@@ -12,11 +16,10 @@ class TeamsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<TeamsBloc>(builder: (context, teamsBloc, child) {
       List<Team> teams = teamsBloc.teams ?? [];
-      List<Team> invitations = teamsBloc.invitations ?? [];
+      List<Invitation> invitations = teamsBloc.invitations ?? [];
       return RefreshIndicator(
         onRefresh: () async {
-          Provider.of<TeamsBloc>(context, listen: false).getInvitations();
-          Provider.of<TeamsBloc>(context, listen: false).getTeams();
+          Provider.of<TeamsBloc>(context, listen: false).refreshData();
         },
         child: Stack(children: [
           ListView(children: [
@@ -40,15 +43,30 @@ class TeamsPage extends StatelessWidget {
     });
   }
 
-  showAlertDialog(BuildContext context) {
+  buildAcceptInvitationDialog(BuildContext context, int id) {
     // set up the buttons
     Widget cancelButton = FlatButton(
       child: Text("Reject"),
-      onPressed: () {},
+      onPressed: () async {
+        Navigator.pop(context);
+      },
     );
     Widget continueButton = FlatButton(
       child: Text("Accept"),
-      onPressed: () {},
+      onPressed: () async {
+        Navigator.pop(context);
+        ApiResponse r = await TeamApi.join(id);
+        if (r.hasErrors()) {
+          Fluttertoast.showToast(
+              msg: "Something went wrong! Please try again.",
+              backgroundColor: Theme.of(context).accentColor);
+          return;
+        }
+        Fluttertoast.showToast(
+          msg: "Team joined successfully!.",
+        );
+        Provider.of<TeamsBloc>(context, listen: false).refreshData();
+      },
     );
 
     // set up the AlertDialog
@@ -70,7 +88,7 @@ class TeamsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInvitations(List<Team> teams, BuildContext context) {
+  Widget _buildInvitations(List<Invitation> invitations, BuildContext context) {
     return ExpansionTile(
       expandedAlignment: Alignment.topLeft,
       childrenPadding: EdgeInsets.all(0),
@@ -78,7 +96,14 @@ class TeamsPage extends StatelessWidget {
       maintainState: true,
       title: _buildHeader("INVITATIONS", context),
       children: <Widget>[
-        _buildTeams(teams, true, context),
+        ListView.builder(
+          physics: NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          itemCount: invitations.length,
+          itemBuilder: (context, index) {
+            return _buildTeamRow(invitations[index].team, true, context);
+          },
+        )
       ],
     );
   }
@@ -123,7 +148,7 @@ class TeamsPage extends StatelessWidget {
         onTap: () {
           !isInvitation
               ? Navigator.pushNamed(context, 'team/show', arguments: team.id)
-              : showAlertDialog(context);
+              : buildAcceptInvitationDialog(context, team.id);
         },
         contentPadding: EdgeInsets.all(0),
         title: Text(
