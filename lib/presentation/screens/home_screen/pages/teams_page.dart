@@ -29,8 +29,9 @@ class _TeamsPageState extends State<TeamsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildTeamsText(),
-                  _buildTeams(teams),
+                  _buildInvitations(teams),
+                  _buildHeader("JOINED TEAMS"),
+                  _buildTeams(teams, false),
                   teams.length > 0 ? Container() : _buildAddTeamButton(),
                 ],
               ),
@@ -41,11 +42,53 @@ class _TeamsPageState extends State<TeamsPage> {
     });
   }
 
-  Widget _buildTeamsText() {
+  showAlertDialog(BuildContext context) {
+    // set up the buttons
+    Widget cancelButton = FlatButton(
+      child: Text("Reject"),
+      onPressed: () {},
+    );
+    Widget continueButton = FlatButton(
+      child: Text("Accept"),
+      onPressed: () {},
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Join Team"),
+      content: Text("Do you want to accept this invitation?"),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  Widget _buildInvitations(List<Team> teams) {
+    return ExpansionTile(
+      childrenPadding: EdgeInsets.all(0),
+      tilePadding: EdgeInsets.all(0),
+      maintainState: true,
+      title: _buildHeader("INVITATIONS"),
+      children: <Widget>[
+        _buildTeams(teams, true),
+      ],
+    );
+  }
+
+  Widget _buildHeader(String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Text(
-        'TEAMS',
+        title,
         style: Theme.of(context).textTheme.headline2.copyWith(
               color: AppTheme.inactiveGreyColor,
             ),
@@ -53,7 +96,7 @@ class _TeamsPageState extends State<TeamsPage> {
     );
   }
 
-  Widget _buildTeams(List<Team> teams) {
+  Widget _buildTeams(List<Team> teams, bool isInvitation) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 4),
       child: teams.length > 0
@@ -62,7 +105,7 @@ class _TeamsPageState extends State<TeamsPage> {
               shrinkWrap: true,
               itemCount: teams.length,
               itemBuilder: (context, index) {
-                return _buildTeamRow(teams[index]);
+                return _buildTeamRow(teams[index], isInvitation);
               },
             )
           : Text(
@@ -74,11 +117,13 @@ class _TeamsPageState extends State<TeamsPage> {
     );
   }
 
-  Widget _buildTeamRow(Team team) {
+  Widget _buildTeamRow(Team team, bool isInvitation) {
     return Container(
       child: ListTile(
         onTap: () {
-          Navigator.pushNamed(context, 'team/show', arguments: team.id);
+          !isInvitation
+              ? Navigator.pushNamed(context, 'team/show', arguments: team.id)
+              : showAlertDialog(context);
         },
         contentPadding: EdgeInsets.all(0),
         title: Text(

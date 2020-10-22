@@ -16,6 +16,7 @@ class AppTheme {
     scaffoldBackgroundColor: Colors.white,
     brightness: Brightness.light,
     textTheme: lightTextTheme,
+    dividerColor: Colors.transparent,
   );
 
   // static final ThemeData darkTheme = ThemeData(

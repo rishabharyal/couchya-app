@@ -30,40 +30,43 @@ class _CustomFormFieldState extends State<CustomFormField> {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: SizeConfig.heightMultiplier * 1),
-      child: TextFormField(
-        textAlign: widget.isCenterAligned ? TextAlign.center : TextAlign.left,
-        style: Theme.of(context)
-            .textTheme
-            .bodyText1
-            .copyWith(fontSize: SizeConfig.textMultiplier * 3),
-        inputFormatters: !widget.isWhiteSpaceAllowed
-            ? [WhitelistingTextInputFormatter(RegExp(r'[a-zA-Z0-9._@]'))]
-            : [],
-        controller: widget.controller,
-        validator: widget.validator,
-        maxLines: 1,
-        obscureText: widget.isPassword && !isPasswordVisible,
-        decoration: InputDecoration(
-          contentPadding: EdgeInsets.all(8),
-          isDense: true,
-          hintText: widget.hint != '' ? widget.hint : '',
-          hintStyle: Theme.of(context).textTheme.headline2.copyWith(
-                color: AppTheme.inactiveGreyColor,
-              ),
-          suffixIcon: widget.isPassword
-              ? IconButton(
-                  padding: EdgeInsets.all(0),
-                  icon: Icon(
-                    isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                    color: Theme.of(context).primaryColorDark,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      isPasswordVisible = !isPasswordVisible;
-                    });
-                  },
-                )
-              : null,
+      child: IntrinsicHeight(
+        child: TextFormField(
+          textAlign: widget.isCenterAligned ? TextAlign.center : TextAlign.left,
+          style: Theme.of(context)
+              .textTheme
+              .bodyText1
+              .copyWith(fontSize: SizeConfig.textMultiplier * 3),
+          inputFormatters: !widget.isWhiteSpaceAllowed
+              ? [WhitelistingTextInputFormatter(RegExp(r'[a-zA-Z0-9._@]'))]
+              : [],
+          controller: widget.controller,
+          validator: widget.validator,
+          obscureText: widget.isPassword && !isPasswordVisible,
+          decoration: InputDecoration(
+            isDense: true,
+            hintText: widget.hint != '' ? widget.hint : '',
+            hintStyle: Theme.of(context).textTheme.headline2.copyWith(
+                  color: AppTheme.inactiveGreyColor,
+                ),
+            suffixIcon: widget.isPassword
+                ? IconButton(
+                    iconSize: SizeConfig.textMultiplier * 3,
+                    padding: EdgeInsets.all(0),
+                    icon: Icon(
+                      isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: Theme.of(context).primaryColorDark,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        isPasswordVisible = !isPasswordVisible;
+                      });
+                    },
+                  )
+                : null,
+          ),
         ),
       ),
     );

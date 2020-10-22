@@ -5,6 +5,9 @@ class User {
   final String role;
   final String phone;
   final String image;
+  final String country;
+  final String countryCode;
+  final String phoneNumber;
 
   User({
     this.id,
@@ -13,6 +16,9 @@ class User {
     this.role,
     this.phone,
     this.image,
+    this.country,
+    this.countryCode,
+    this.phoneNumber,
   });
 
   static User fromJson(json) {
@@ -23,6 +29,9 @@ class User {
       role: json['role'] != null ? json['role']['name'] : null,
       phone: json['phone'],
       image: json['profile_picture'],
+      country: json['country'] ?? null,
+      countryCode: json['country_code'] ?? null,
+      phoneNumber: json['phone_number'] ?? null,
     );
   }
 }

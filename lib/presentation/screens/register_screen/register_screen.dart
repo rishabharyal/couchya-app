@@ -1,7 +1,7 @@
 import 'package:couchya/api/auth.dart';
-import 'package:couchya/api/team.dart';
 import 'package:couchya/presentation/common/alert.dart';
 import 'package:couchya/presentation/common/form_field.dart';
+import 'package:couchya/presentation/common/phone_field.dart';
 import 'package:couchya/utilities/api_response.dart';
 import 'package:couchya/utilities/app_theme.dart';
 import 'package:couchya/utilities/size_config.dart';
@@ -11,9 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class RegisterScreen extends StatefulWidget {
-  final AsyncSnapshot snapshot;
-
-  const RegisterScreen(this.snapshot);
   @override
   _RegisterScreenState createState() => _RegisterScreenState();
 }
@@ -24,6 +21,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = new TextEditingController();
   final TextEditingController _passwordController = new TextEditingController();
   final TextEditingController _nameController = new TextEditingController();
+  final TextEditingController _phoneController = new TextEditingController();
+  String _countryCode = "+1";
+  String _country = "US";
   bool _isLoading = false;
   bool _isTermsChecked = false;
 
@@ -32,6 +32,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     this._emailController.dispose();
     this._passwordController.dispose();
     this._nameController.dispose();
+    this._phoneController.dispose();
     super.dispose();
   }
 
@@ -41,7 +42,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
-            // height: SizeConfig.screenHeight,
+            constraints: BoxConstraints(
+              minHeight:
+                  SizeConfig.screenHeight - MediaQuery.of(context).padding.top,
+            ),
             width: SizeConfig.screenWidth,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -53,7 +57,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildBackButton(),
-                      _buildLoginForm(),
+                      _buildRegisterForm(),
                     ],
                   ),
                 ),
@@ -82,13 +86,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildLoginForm() {
+  Widget _buildRegisterForm() {
     return Container(
-      height: SizeConfig.heightMultiplier * 70,
       child: Form(
         key: this._formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               margin: EdgeInsets.symmetric(
@@ -113,6 +117,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 return Validator.email(value);
               },
             ),
+            InternationalPhoneInput(
+              onCodeChanged: (code, country) {
+                _countryCode = code;
+                _country = country;
+              },
+              formStyle: Theme.of(context)
+                  .textTheme
+                  .bodyText1
+                  .copyWith(fontSize: SizeConfig.textMultiplier * 3),
+              hintText: "Phone",
+              hintStyle: Theme.of(context).textTheme.headline2.copyWith(
+                    color: AppTheme.inactiveGreyColor,
+                  ),
+              initialSelection: "US",
+              enabledCountries: ['+233', '+1', '+977'],
+              labelText: "Phone Number",
+              validator: (value) {
+                Validator.phone(value);
+              },
+              controller: _phoneController,
+            ),
             CustomFormField(
               hint: 'Password',
               isPassword: true,
@@ -128,12 +153,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 title: RichText(
                   text: TextSpan(
                     text: 'I agree with the',
-                    style: Theme.of(context).textTheme.bodyText2,
+                    style: Theme.of(context).textTheme.bodyText2.copyWith(
+                          fontSize: 14,
+                        ),
                     children: [
                       TextSpan(
                         text: ' Terms & Conditions ',
                         style: Theme.of(context).textTheme.bodyText2.copyWith(
                               color: Theme.of(context).primaryColor,
+                              fontSize: 14,
                             ),
                       ),
                     ],
@@ -190,7 +218,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   _buildFooter() {
     return Container(
-      height: SizeConfig.heightMultiplier * 18,
+      padding: EdgeInsets.symmetric(vertical: 18, horizontal: 12),
       width: MediaQuery.of(context).size.width,
       color: Color(0xfff6f6f6),
       child: Column(
@@ -200,42 +228,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
             "Already have an account?",
             style: Theme.of(context).textTheme.bodyText1,
           ),
-          FlatButton(
-            onPressed: () {
-              Navigator.pushNamed(context, 'login');
-            },
-            child: Text(
-              "Sign In",
-              style: Theme.of(context).textTheme.headline2,
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, 'login');
+              },
+              child: Text(
+                "Sign in",
+                style: Theme.of(context).textTheme.headline2,
+              ),
             ),
-          )
+          ),
         ],
       ),
     );
-  }
-
-  Future _joinTeam(id) async {
-    Fluttertoast.showToast(
-      msg: "Joining Team!",
-      backgroundColor: AppTheme.accentColor,
-    );
-    ApiResponse r = await TeamApi.join(id);
-    if (r.hasErrors()) {
-      Fluttertoast.showToast(
-        msg: r.getMessage() != ""
-            ? r.getMessage()
-            : 'Something went wrong. Please try again!',
-        backgroundColor: AppTheme.accentColor,
-      );
-      return null;
-    }
-    Fluttertoast.showToast(
-      msg: r.getMessage() != ""
-          ? r.getMessage()
-          : 'You have joined the team successfully!',
-      backgroundColor: Theme.of(context).primaryColor,
-    );
-    return null;
   }
 
   Future<void> _handleRegister() async {
@@ -248,8 +255,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
       'email': _emailController.text,
       'password': _passwordController.text,
       'name': _nameController.text,
+      'phone_number': _phoneController.text,
+      'country_code': _countryCode.replaceAll("+", ""),
+      'country': _country
     };
 
+    print(data);
     try {
       ApiResponse response = await Auth.register(data);
       if (response.hasErrors()) {
@@ -259,16 +270,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             msg: error ?? 'Something went wrong. Please try again!',
             backgroundColor: Theme.of(context).accentColor);
       } else {
-        if ((widget.snapshot != null && widget.snapshot.hasData)) {
-          var uri = Uri.parse(widget.snapshot.data);
-          var list = uri.queryParametersAll;
-          int id = int.parse(list['id'][0]);
-          String path = uri.path;
-
-          if (path == "/team/join" && id != null) {
-            _joinTeam(id);
-          }
-        }
         Navigator.of(context)
             .pushNamedAndRemoveUntil('home', (Route<dynamic> route) => false);
       }

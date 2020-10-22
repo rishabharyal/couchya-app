@@ -321,7 +321,6 @@ class _InviteTeamMembersScreenState extends State<InviteTeamMembersScreen> {
     List<String> selectedNumbers = selectedContacts
         .map((e) => e.phones.length > 0 ? e.phones.elementAt(0).value : '')
         .toList();
-    selectedNumbers = ['+9779865011077'];
     ApiResponse r = await TeamApi.sendInvitation(
         {'team_id': widget.id, 'invitations': selectedNumbers});
     setState(() {

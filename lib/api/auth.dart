@@ -29,14 +29,16 @@ class Auth {
 
   static me() async {
     ApiResponse userResponse = await CallApi.get('user');
-    print(userResponse.getData());
     if (!userResponse.hasErrors()) {
       LocalStorage.setUser({
         'id': userResponse.getData()['data']['id'],
         'name': userResponse.getData()['data']['name'],
         'email': userResponse.getData()['data']['email'],
         'profile_picture':
-            userResponse.getData()['data']['profile_picture'] ?? ''
+            userResponse.getData()['data']['profile_picture'] ?? '',
+        'phone_number': userResponse.getData()['data']['phone_number'] ?? '',
+        'country': userResponse.getData()['data']['country'] ?? '',
+        'country_code': userResponse.getData()['data']['country_code'] ?? '',
       });
     } else
       logout();

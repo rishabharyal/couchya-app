@@ -45,10 +45,10 @@ class HomePageBloc extends ChangeNotifier {
   loadMovies() async {
     _page++;
     List<Movie> movies = await MovieApi.getAll({
-      'page': _page,
+      'page': _page.toString(),
       'genre': _genre,
-      'range_start': _range.start.round().toInt(),
-      'range_end': _range.end.round().toInt(),
+      'range_start': _range.start.round().toInt().toString(),
+      'range_end': _range.end.round().toInt().toString(),
     });
     print(movies.length);
     setMovies(movies);
