@@ -17,4 +17,10 @@ class Validator {
     if (value.length < 4) return "Name must contain at least 4 letters!";
     return null;
   }
+
+  static String phone(value) {
+    if (value.length == 0) return "Phone cannot be empty";
+    if (!phoneRegex.hasMatch(value)) return "Please enter a valid phone!";
+    return null;
+  }
 }

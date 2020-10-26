@@ -5,7 +5,7 @@ import 'package:couchya/utilities/api_response.dart';
 class TeamApi {
   static Future<List<Team>> getAll() async {
     ApiResponse response = await CallApi.get('team');
-    if (response.hasErrors()) return null;
+    if (response.hasErrors()) return [];
     return List<Team>.from(response.getData()['data'].map<Team>((team) {
       return Team.fromJson(team);
     }).toList());

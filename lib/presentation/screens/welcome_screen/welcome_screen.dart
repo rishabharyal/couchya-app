@@ -3,9 +3,6 @@ import 'package:couchya/utilities/size_config.dart';
 import 'package:flutter/material.dart';
 
 class WelcomeScreen extends StatefulWidget {
-  final AsyncSnapshot snapshot;
-
-  const WelcomeScreen(this.snapshot);
   @override
   _WelcomeScreenState createState() => _WelcomeScreenState();
 }
@@ -20,10 +17,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
+        height: SizeConfig.screenHeight,
+        width: SizeConfig.screenWidth,
         color: Colors.white,
-        padding: EdgeInsets.all(MediaQuery.of(context).padding.top),
+        padding:
+            EdgeInsets.fromLTRB(24, MediaQuery.of(context).padding.top, 24, 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -84,7 +82,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         children: [
           GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, 'login', arguments: widget.snapshot);
+              Navigator.pushNamed(context, 'login');
             },
             child: Container(
               child: Text(
@@ -95,8 +93,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           ),
           GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, 'register',
-                  arguments: widget.snapshot);
+              Navigator.pushNamed(
+                context,
+                'register',
+              );
             },
             child: Container(
               child: Text(

@@ -1,5 +1,4 @@
 import 'package:couchya/api/auth.dart';
-import 'package:couchya/api/team.dart';
 import 'package:couchya/presentation/common/alert.dart';
 import 'package:couchya/presentation/common/form_field.dart';
 import 'package:couchya/utilities/api_response.dart';
@@ -11,9 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginScreen extends StatefulWidget {
-  final AsyncSnapshot snapshot;
-
-  const LoginScreen(this.snapshot);
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -24,8 +20,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = new TextEditingController();
   final TextEditingController _passwordController = new TextEditingController();
   bool _isLoading = false;
-  String _email = "";
-  String _password = "";
 
   @override
   void dispose() {
@@ -40,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
           child: SingleChildScrollView(
         child: Container(
-          height: SizeConfig.screenHeight,
+          height: SizeConfig.screenHeight - MediaQuery.of(context).padding.top,
           width: SizeConfig.screenWidth,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -103,6 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
           CustomFormField(
             hint: 'Password',
             isPassword: true,
+            isWhiteSpaceAllowed: false,
             controller: _passwordController,
             validator: (value) {
               return Validator.password(value);
@@ -156,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   _buildFooter() {
     return Container(
-      height: SizeConfig.heightMultiplier * 18,
+      padding: EdgeInsets.symmetric(vertical: 18, horizontal: 12),
       width: MediaQuery.of(context).size.width,
       color: Color(0xfff6f6f6),
       child: Column(
@@ -166,15 +161,18 @@ class _LoginScreenState extends State<LoginScreen> {
             "Don't have an account?",
             style: Theme.of(context).textTheme.bodyText1,
           ),
-          FlatButton(
-            onPressed: () {
-              Navigator.pushNamed(context, 'register');
-            },
-            child: Text(
-              "Sign Up",
-              style: Theme.of(context).textTheme.headline2,
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pushReplacementNamed(context, 'register');
+              },
+              child: Text(
+                "Sign up",
+                style: Theme.of(context).textTheme.headline2,
+              ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -200,16 +198,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 : 'Something went wrong. Please try again!',
             backgroundColor: Theme.of(context).accentColor);
       } else {
-        if ((widget.snapshot != null && widget.snapshot.hasData)) {
-          var uri = Uri.parse(widget.snapshot.data);
-          var list = uri.queryParametersAll;
-          int id = int.parse(list['id'][0]);
-          String path = uri.path;
-
-          if (path == "/team/join" && id != null) {
-            _joinTeam(id);
-          }
-        }
         Navigator.of(context)
             .pushNamedAndRemoveUntil('home', (Route<dynamic> route) => false);
       }
@@ -221,29 +209,5 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _isLoading = false;
     });
-  }
-
-  Future _joinTeam(id) async {
-    Fluttertoast.showToast(
-      msg: "Joining Team!",
-      backgroundColor: AppTheme.accentColor,
-    );
-    ApiResponse r = await TeamApi.join(id);
-    if (r.hasErrors()) {
-      Fluttertoast.showToast(
-        msg: r.getMessage() != ""
-            ? r.getMessage()
-            : 'Something went wrong. Please try again!',
-        backgroundColor: AppTheme.accentColor,
-      );
-      return null;
-    }
-    Fluttertoast.showToast(
-      msg: r.getMessage() != ""
-          ? r.getMessage()
-          : 'You have joined the team successfully!',
-      backgroundColor: Theme.of(context).primaryColor,
-    );
-    return null;
   }
 }

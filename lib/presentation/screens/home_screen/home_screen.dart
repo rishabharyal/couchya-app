@@ -1,7 +1,7 @@
 import 'package:couchya/api/auth.dart';
 import 'package:couchya/models/user.dart';
 import 'package:couchya/presentation/bloc/home_page_bloc.dart';
-import 'package:couchya/presentation/bloc/matches_page_bloc.dart';
+import 'package:couchya/presentation/bloc/teams_bloc.dart';
 import 'package:couchya/presentation/common/dropdown.dart';
 import 'package:couchya/presentation/common/logo.dart';
 import 'package:couchya/presentation/common/range.dart';
@@ -67,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     Provider.of<HomePageBloc>(context, listen: false).loadMovies();
-    Provider.of<TeamsBloc>(context, listen: false).getTeams();
+    Provider.of<TeamsBloc>(context, listen: false).refreshData();
     _getUserDetails();
     super.initState();
   }
@@ -181,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildFilterWidget() {
     return AnimatedPositioned(
-      top: _isFilterVisible ? 0 : -1000,
+      top: _isFilterVisible ? 0 : -400,
       curve: Curves.fastOutSlowIn,
       duration: Duration(milliseconds: 600),
       child: Container(

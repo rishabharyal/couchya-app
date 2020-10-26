@@ -19,6 +19,7 @@ class InviteTeamMembersScreen extends StatefulWidget {
 class _InviteTeamMembersScreenState extends State<InviteTeamMembersScreen> {
   bool isSearching = false;
   bool isLoading = false;
+  bool _isGettingContacts = false;
 
   TextEditingController searchController = new TextEditingController();
   List<Contact> contacts = [];
@@ -47,6 +48,9 @@ class _InviteTeamMembersScreenState extends State<InviteTeamMembersScreen> {
   }
 
   getAllContacts() async {
+    setState(() {
+      _isGettingContacts = true;
+    });
     List colors = [Colors.green, Colors.indigo, Colors.yellow, Colors.orange];
     int colorIndex = 0;
     List<Contact> _contacts = (await ContactsService.getContacts()).toList();
@@ -60,6 +64,7 @@ class _InviteTeamMembersScreenState extends State<InviteTeamMembersScreen> {
     });
     setState(() {
       contacts = _contacts;
+      _isGettingContacts = false;
     });
   }
 
@@ -156,63 +161,73 @@ class _InviteTeamMembersScreenState extends State<InviteTeamMembersScreen> {
   }
 
   Widget _buildAllContactsListView() {
-    return Expanded(
-      child: Padding(
-        padding: EdgeInsets.only(left: 16, right: 16, top: 4),
-        child: ListView.builder(
-          shrinkWrap: true,
-          itemCount:
-              isSearching == true ? contactsFiltered.length : contacts.length,
-          itemBuilder: (context, index) {
-            Contact contact =
-                isSearching == true ? contactsFiltered[index] : contacts[index];
+    return _isGettingContacts
+        ? Expanded(
+            child: Container(
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          )
+        : Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(left: 16, right: 16, top: 4),
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: isSearching == true
+                    ? contactsFiltered.length
+                    : contacts.length,
+                itemBuilder: (context, index) {
+                  Contact contact = isSearching == true
+                      ? contactsFiltered[index]
+                      : contacts[index];
 
-            return selectedContacts.contains(contact)
-                ? Container()
-                : ListTile(
-                    contentPadding: EdgeInsets.symmetric(vertical: 12),
-                    title: Text(
-                      contact.displayName,
-                      style: Theme.of(context).textTheme.headline2,
-                    ),
-                    trailing: IconButton(
-                      icon: Icon(
-                        Icons.add_circle_outline_sharp,
-                        color: Colors.black,
-                        size: 28,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          this.selectedContacts.add(contact);
-                        });
-                      },
-                    ),
-                    leading:
-                        (contact.avatar != null && contact.avatar.length > 0)
-                            ? CircleAvatar(
-                                backgroundImage: MemoryImage(contact.avatar),
-                              )
-                            : Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Theme.of(context).accentColor,
-                                ),
-                                child: CircleAvatar(
-                                  radius: 28,
-                                  child: Text(
-                                    contact.initials(),
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ),
+                  return selectedContacts.contains(contact)
+                      ? Container()
+                      : ListTile(
+                          contentPadding: EdgeInsets.symmetric(vertical: 12),
+                          title: Text(
+                            contact.displayName,
+                            style: Theme.of(context).textTheme.headline2,
+                          ),
+                          trailing: IconButton(
+                            icon: Icon(
+                              Icons.add_circle_outline_sharp,
+                              color: Colors.black,
+                              size: 28,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                this.selectedContacts.add(contact);
+                              });
+                            },
+                          ),
+                          leading: (contact.avatar != null &&
+                                  contact.avatar.length > 0)
+                              ? CircleAvatar(
+                                  backgroundImage: MemoryImage(contact.avatar),
+                                )
+                              : Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Theme.of(context).accentColor,
                                   ),
-                                  backgroundColor: Colors.transparent,
+                                  child: CircleAvatar(
+                                    radius: 28,
+                                    child: Text(
+                                      contact.initials(),
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    backgroundColor: Colors.transparent,
+                                  ),
                                 ),
-                              ),
-                  );
-          },
-        ),
-      ),
-    );
+                        );
+                },
+              ),
+            ),
+          );
   }
 
   Widget _buildSelectedContactsListView() {
@@ -285,19 +300,27 @@ class _InviteTeamMembersScreenState extends State<InviteTeamMembersScreen> {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
-      leading: IconButton(
-        icon: Icon(Icons.check),
-        iconSize: 24,
-        color: Colors.black,
-        onPressed: isLoading
-            ? null
-            : () async {
-                await sendInvitations();
-              },
-      ),
+      leading: isLoading
+          ? SizedBox(
+              width: 10,
+              height: 10,
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            )
+          : IconButton(
+              icon: Icon(Icons.check),
+              iconSize: 24,
+              color: Colors.black,
+              onPressed: selectedContacts.length == 0
+                  ? null
+                  : () async {
+                      await sendInvitations();
+                    },
+            ),
       title: Center(
         child: Text(
-          'NEW TEAM',
+          'INVITE CONTACTS',
           style: Theme.of(context).textTheme.headline2,
         ),
       ),
@@ -321,7 +344,6 @@ class _InviteTeamMembersScreenState extends State<InviteTeamMembersScreen> {
     List<String> selectedNumbers = selectedContacts
         .map((e) => e.phones.length > 0 ? e.phones.elementAt(0).value : '')
         .toList();
-    selectedNumbers = ['+9779865011077'];
     ApiResponse r = await TeamApi.sendInvitation(
         {'team_id': widget.id, 'invitations': selectedNumbers});
     setState(() {

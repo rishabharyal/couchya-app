@@ -3,7 +3,6 @@ import 'package:couchya/api/auth.dart';
 import 'package:couchya/app_config.dart';
 import 'package:couchya/utilities/api_response.dart';
 import 'package:couchya/utilities/local_storage.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class CallApi {
@@ -19,15 +18,11 @@ class CallApi {
     return sendResponse(response);
   }
 
-  static Future<ApiResponse> get(path, [queryParams]) async {
+  static Future<ApiResponse> get(path,
+      [Map<String, String> queryParams]) async {
     if (queryParams == null) queryParams = {};
-    String fullUrl = 'https://' +
-        AppConfig.API_URL +
-        '/api/' +
-        path +
-        '?' +
-        getQueryString(queryParams);
-    print(fullUrl);
+
+    Uri fullUrl = Uri.https(AppConfig.API_URL, '/api/' + path, queryParams);
     var response = await http.get(fullUrl,
         headers: _setHeaders(await LocalStorage.getToken()));
     print(json.decode(response.body));
@@ -53,31 +48,8 @@ class CallApi {
     } else if (response.statusCode == 401) {
       Auth.logout();
     }
-    ;
+
     apiResponse.setErrors(decoded['data']);
     return apiResponse;
   }
-}
-
-String getQueryString(Map params,
-    {String prefix: '&', bool inRecursion: false}) {
-  String query = '';
-
-  params.forEach((key, value) {
-    if (inRecursion) {
-      key = '[$key]';
-    }
-
-    if (value is String || value is int || value is double || value is bool) {
-      query += '$prefix$key=$value';
-    } else if (value is List || value is Map) {
-      if (value is List) value = value.asMap();
-      value.forEach((k, v) {
-        query +=
-            getQueryString({k: v}, prefix: '$prefix$key', inRecursion: true);
-      });
-    }
-  });
-
-  return query;
 }

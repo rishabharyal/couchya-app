@@ -1,11 +1,9 @@
 import 'package:couchya/api/team.dart';
-import 'package:couchya/app_config.dart';
 import 'package:couchya/presentation/common/form_field.dart';
 import 'package:couchya/utilities/api_response.dart';
 import 'package:couchya/utilities/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
 
 class CreateTeamScreen extends StatefulWidget {
   @override
