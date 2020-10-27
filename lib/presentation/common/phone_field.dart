@@ -200,7 +200,7 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
                   setState(() {
                     selectedItem = newValue;
                   });
-                  _validatePhoneNumber();
+                  // _validatePhoneNumber();
                 },
                 items: itemList.map<DropdownMenuItem<Country>>((Country value) {
                   return DropdownMenuItem<Country>(
