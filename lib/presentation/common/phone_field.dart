@@ -126,27 +126,28 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
 
   _validatePhoneNumber() {
     String phoneText = phoneTextController.text;
-    if (phoneText != null && phoneText.isNotEmpty) {
-      PhoneService.parsePhoneNumber(phoneText, selectedItem.code)
-          .then((isValid) {
-        setState(() {
-          hasError = !isValid;
-        });
-
+    // if (phoneText != null && phoneText.isNotEmpty) {
+    //   PhoneService.parsePhoneNumber(phoneText, selectedItem.code)
+    //       .then((isValid) {
+    //     setState(() {
+    //       hasError = !isValid;
+    //     });
+    //
         if (widget.onPhoneNumberChange != null) {
-          if (isValid) {
-            PhoneService.getNormalizedPhoneNumber(phoneText, selectedItem.code)
-                .then((number) {
-              widget.onPhoneNumberChange(
-                  phoneText, number, selectedItem.code, selectedItem.dialCode);
-            });
-          } else {
+          //       if (isValid) {
+          PhoneService.getNormalizedPhoneNumber(phoneText, selectedItem.code)
+              .then((number) {
             widget.onPhoneNumberChange(
-                '', '', selectedItem.code, selectedItem.dialCode);
-          }
+                phoneText, number, selectedItem.code, selectedItem.dialCode);
+          });
         }
-      });
-    }
+    //       } else {
+    //         widget.onPhoneNumberChange(
+    //             '', '', selectedItem.code, selectedItem.dialCode);
+    //       }
+    //     }
+    //   });
+    // }
   }
 
   Future<List<Country>> _fetchCountryData() async {
