@@ -20,7 +20,7 @@ class Validator {
 
   static String phone(value) {
     if (value.length == 0) return "Phone cannot be empty";
-    if (!phoneRegex.hasMatch(value)) return "Please enter a valid phone!";
+    if (value.length != 10) return "Please enter a valid phone!";
     return null;
   }
 }

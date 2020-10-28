@@ -187,20 +187,17 @@ class TeamsPage extends StatelessWidget {
           style: Theme.of(context).textTheme.headline2.copyWith(),
         ),
         trailing: Container(
-          height: 22,
-          width: 22,
+          padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
           decoration: BoxDecoration(
             color: Theme.of(context).accentColor,
             borderRadius: BorderRadius.circular(4),
           ),
-          child: Center(
-            child: Text(
-              '2',
-              style: Theme.of(context).textTheme.headline2.copyWith(
-                    fontSize: 18,
-                    color: Colors.white,
-                  ),
-            ),
+          child: Text(
+            '2',
+            style: Theme.of(context).textTheme.headline2.copyWith(
+                  fontSize: 18,
+                  color: Colors.white,
+                ),
           ),
         ),
         subtitle: Container(

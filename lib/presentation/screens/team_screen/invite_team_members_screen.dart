@@ -19,6 +19,7 @@ class InviteTeamMembersScreen extends StatefulWidget {
 class _InviteTeamMembersScreenState extends State<InviteTeamMembersScreen> {
   bool isSearching = false;
   bool isLoading = false;
+  final _formKey = GlobalKey<FormState>();
   bool _isGettingContacts = false;
 
   TextEditingController searchController = new TextEditingController();
@@ -119,17 +120,62 @@ class _InviteTeamMembersScreenState extends State<InviteTeamMembersScreen> {
   }
 
   Widget _buildSearchBar() {
-    return CustomFormField(
-      hint: 'SEARCH NAME/PHONE',
-      controller: searchController,
-      isPassword: false,
-      isWhiteSpaceAllowed: true,
-      isCenterAligned: true,
-      validator: (value) {
-        if (value.length < 3) return 'Name must contain at least 3 letters';
-        return null;
-      },
+    return Container(
+      padding: EdgeInsets.all(12),
+      child: Form(
+        key: _formKey,
+        child: Row(
+          children: [
+            Expanded(
+              flex: 6,
+              child: CustomFormField(
+                hint: 'Search/Add Phone',
+                controller: searchController,
+                isPassword: false,
+                isWhiteSpaceAllowed: true,
+                validator: (value) {
+                  if (value.length < 3)
+                    return 'Name must contain at least 3 letters';
+                  if (value.length != 10) {
+                    return 'Please Enter a valid Number';
+                  }
+                  return null;
+                },
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: IconButton(
+                icon: Icon(Icons.add_circle),
+                iconSize: 32,
+                onPressed: _isGettingContacts
+                    ? null
+                    : () {
+                        if (_formKey.currentState.validate()) {
+                          this._addNumber();
+                        }
+                      },
+              ),
+            ),
+          ],
+        ),
+      ),
     );
+  }
+
+  _addNumber() {
+    setState(() {
+      selectedContacts.add(Contact(
+        displayName: searchController.text,
+        givenName: searchController.text,
+        phones: [
+          Item(
+            label: searchController.text,
+            value: searchController.text,
+          )
+        ],
+      ));
+    });
   }
 
   Widget _buildAllContactsHeader() {

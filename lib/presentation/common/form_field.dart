@@ -10,6 +10,7 @@ class CustomFormField extends StatefulWidget {
   final String hint;
   final bool isWhiteSpaceAllowed;
   final bool isCenterAligned;
+  TextInputType keyboardType;
 
   CustomFormField({
     this.isPassword = false,
@@ -18,6 +19,7 @@ class CustomFormField extends StatefulWidget {
     this.hint,
     this.isWhiteSpaceAllowed = false,
     this.isCenterAligned = false,
+    this.keyboardType = TextInputType.text,
   });
   @override
   _CustomFormFieldState createState() => _CustomFormFieldState();
@@ -32,6 +34,7 @@ class _CustomFormFieldState extends State<CustomFormField> {
       margin: EdgeInsets.symmetric(vertical: SizeConfig.heightMultiplier * 1),
       child: IntrinsicHeight(
         child: TextFormField(
+          keyboardType: widget.keyboardType,
           textAlign: widget.isCenterAligned ? TextAlign.center : TextAlign.left,
           style: Theme.of(context)
               .textTheme

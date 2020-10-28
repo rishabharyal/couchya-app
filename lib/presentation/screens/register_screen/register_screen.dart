@@ -1,7 +1,6 @@
 import 'package:couchya/api/auth.dart';
 import 'package:couchya/presentation/common/alert.dart';
 import 'package:couchya/presentation/common/form_field.dart';
-import 'package:couchya/presentation/common/phone_field.dart';
 import 'package:couchya/utilities/api_response.dart';
 import 'package:couchya/utilities/app_theme.dart';
 import 'package:couchya/utilities/size_config.dart';
@@ -21,9 +20,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = new TextEditingController();
   final TextEditingController _passwordController = new TextEditingController();
   final TextEditingController _nameController = new TextEditingController();
-  String _countryCode = "+1";
-  String _country = "US";
-  String _phoneNumber;
+  final TextEditingController _phoneController = new TextEditingController();
   bool _isLoading = false;
   bool _isTermsChecked = false;
 
@@ -32,6 +29,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     this._emailController.dispose();
     this._passwordController.dispose();
     this._nameController.dispose();
+    this._phoneController.dispose();
     super.dispose();
   }
 
@@ -116,32 +114,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 return Validator.email(value);
               },
             ),
-            InternationalPhoneInput(
-              dropdownIcon: Icon(
-                Icons.filter_none,
-                size: 0,
-              ),
-              onPhoneNumberChange: (String phoneNumber,
-                  String internationalizedPhoneNumber,
-                  String isoCode,
-                  String dialCode) {
-                setState(() {
-                  _phoneNumber = phoneNumber;
-                  _country = isoCode;
-                  _countryCode = dialCode;
-                });
+            CustomFormField(
+              hint: 'Phone',
+              keyboardType: TextInputType.phone,
+              isPassword: false,
+              controller: _phoneController,
+              validator: (value) {
+                return Validator.phone(value);
               },
-              formStyle: Theme.of(context)
-                  .textTheme
-                  .bodyText1
-                  .copyWith(fontSize: SizeConfig.textMultiplier * 3),
-              hintText: "Phone",
-              hintStyle: Theme.of(context).textTheme.headline2.copyWith(
-                    color: AppTheme.inactiveGreyColor,
-                  ),
-              initialSelection: "US",
-              enabledCountries: ['+233', '+1', '+977'],
-              labelText: "Phone Number",
             ),
             CustomFormField(
               hint: 'Password',
@@ -184,9 +164,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             GestureDetector(
               onTap: () {
-                print(_phoneNumber);
                 if (_isTermsChecked &&
-                    _phoneNumber.length > 0 &&
                     !_isLoading &&
                     _formKey.currentState.validate()) {
                   this._handleRegister();
@@ -262,9 +240,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       'email': _emailController.text,
       'password': _passwordController.text,
       'name': _nameController.text,
-      'phone_number': _phoneNumber,
-      'country_code': _countryCode.replaceAll("+", ""),
-      'country': _country
+      'phone_number': _phoneController.text,
+      'country_code': '1',
+      'country': 'US'
     };
 
     print(data);
