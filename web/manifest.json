@@ -1,6 +1,6 @@
 {
-    "name": "couchya",
-    "short_name": "couchya",
+    "name": "couchya_app",
+    "short_name": "couchya_app",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

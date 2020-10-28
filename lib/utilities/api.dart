@@ -21,8 +21,8 @@ class CallApi {
   static Future<ApiResponse> get(path,
       [Map<String, String> queryParams]) async {
     if (queryParams == null) queryParams = {};
+
     Uri fullUrl = Uri.https(AppConfig.API_URL, '/api/' + path, queryParams);
-    print(fullUrl);
     var response = await http.get(fullUrl,
         headers: _setHeaders(await LocalStorage.getToken()));
     print(json.decode(response.body));
