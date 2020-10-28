@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:couchya/presentation/common/logo.dart';
 import 'package:couchya/utilities/size_config.dart';
 import 'package:flutter/material.dart';
@@ -65,8 +66,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget _buildImage() {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 12),
-      child: Image.network(
-        this._imageUrl,
+      child: CachedNetworkImage(
+        imageUrl: this._imageUrl,
+        errorWidget: (context, url, error) => Icon(Icons.error),
         fit: BoxFit.cover,
         height: SizeConfig.heightMultiplier * 35,
         width: MediaQuery.of(context).size.width,

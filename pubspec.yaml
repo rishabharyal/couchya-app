@@ -19,7 +19,7 @@ dependencies:
   flutter_tindercard: ^0.2.0
   contacts_service: ^0.4.6
   page_transition: ^1.1.7+2
-  international_phone_input: ^1.0.4
+  cached_network_image: ^2.3.3
 
 dev_dependencies:
   flutter_test:
