@@ -164,18 +164,20 @@ class _InviteTeamMembersScreenState extends State<InviteTeamMembersScreen> {
   }
 
   _addNumber() {
-    setState(() {
-      selectedContacts.add(Contact(
-        displayName: searchController.text,
-        givenName: searchController.text,
-        phones: [
-          Item(
-            label: searchController.text,
-            value: searchController.text,
-          )
-        ],
-      ));
-    });
+    Contact phone = Contact(
+      displayName: searchController.text,
+      givenName: searchController.text,
+      phones: [
+        Item(
+          label: searchController.text,
+          value: searchController.text,
+        )
+      ],
+    );
+    if (!selectedContacts.contains(phone))
+      setState(() {
+        selectedContacts.add(phone);
+      });
   }
 
   Widget _buildAllContactsHeader() {
